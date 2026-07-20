@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>울릉도 여행 브리핑</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  @font-face{
+    font-family:'GmarketSans';
+    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight:500;
+    font-style:normal;
+  }
+  @font-face{
+    font-family:'GmarketSans';
+    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');
+    font-weight:700;
+    font-style:normal;
+  }
+  :root{
+    --sea-900:#013049;
+    --sea-700:#00577d;
+    --sea-500:#0f7fa8;
+    --sea-300:#5db6cf;
+    --sea-100:#e6f2f5;
+    --sand:#f7f1e3;
+    --accent:#00c189;
+    --accent-bg:#e1faf1;
+    --ok:#00a274;
+    --ok-bg:#e1faf1;
+    --fail:#c94b4b;
+    --fail-bg:#fbeaea;
+    --ink:#1b2a37;
+    --muted:#6b7c8c;
+    --card:#ffffff;
+    --line:#e1e9ef;
+    --radius:14px;
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,var(--sea-100) 0%, #fff 320px);
+    color:var(--ink);
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header.hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(120deg, #00c189 0%, #00a9c7 55%, #0f7fa8 100%);
+    color:#fff;
+    padding:28px 20px 28px;
+    text-align:center;
+  }
+  .logo-chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    border-radius:14px;
+    padding:8px 16px;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+    margin-bottom:16px;
+  }
+  .logo-chip img{
+    height:26px;
+    display:block;
+  }
+  header.hero h1{
+    margin:0;
+    font-family:'GmarketSans','Pretendard',sans-serif;
+    font-size:1.7rem;
+    font-weight:500;
+    letter-spacing:.3px;
+  }
+  .goal-badges{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .goal-badges span{
+    background:rgba(255,255,255,.92);
+    color:var(--sea-900);
+    font-weight:700;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:.85rem;
+    box-shadow:0 2px 8px rgba(0,40,60,.18);
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .dates{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:18px;
+    font-size:.8rem;
+    color:rgba(255,255,255,.9);
+    flex-wrap:wrap;
+  }
+  .dates span{
+    background:rgba(0,0,0,.18);
+    padding:4px 10px;
+    border-radius:8px;
+  }
+
+  /* Tabs */
+  .tabbar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    gap:6px;
+    padding:10px 16px;
+    max-width:720px;
+    margin:0 auto;
+    overflow-x:auto;
+  }
+  .tabbar button{
+    flex:1;
+    min-width:120px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    padding:10px 8px;
+    border-radius:10px;
+    font-size:.8rem;
+    font-weight:600;
+    cursor:pointer;
+    line-height:1.3;
+  }
+  .tabbar button .em{
+    display:block;
+    font-size:.72rem;
+    font-weight:400;
+    margin-top:2px;
+    opacity:.8;
+  }
+  .tabbar button.active{
+    background:var(--sea-500);
+    border-color:var(--sea-500);
+    color:#fff;
+  }
+
+  section.case{
+    display:none;
+    padding-top:18px;
+  }
+  section.case.active{
+    display:block;
+  }
+
+  .case-summary{
+    background:var(--sea-100);
+    border:1px solid #cfe6f3;
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:18px;
+    font-size:.88rem;
+    color:var(--sea-900);
+  }
+
+  .day-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-bottom:18px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(10,37,64,.06);
+  }
+  .day-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px;
+    background:var(--sea-900);
+    color:#fff;
+  }
+  .day-head h2{
+    margin:0;
+    font-family:'GmarketSans','Pretendard',sans-serif;
+    font-weight:500;
+    font-size:1.05rem;
+  }
+  .day-head .date{
+    font-size:.78rem;
+    opacity:.8;
+  }
+  .day-body{
+    padding:14px 16px 16px;
+  }
+  .item{
+    display:flex;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .item:last-child{border-bottom:none;}
+  .item .time{
+    flex:0 0 62px;
+    font-size:.78rem;
+    font-weight:700;
+    color:var(--sea-500);
+    padding-top:2px;
+  }
+  .item .content{flex:1;}
+  .item .content .title{
+    font-weight:600;
+    font-size:.95rem;
+  }
+  .item .content .desc{
+    font-size:.82rem;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .tag{
+    display:inline-block;
+    font-size:.7rem;
+    padding:2px 8px;
+    border-radius:999px;
+    margin-left:6px;
+    font-weight:700;
+    vertical-align:middle;
+  }
+  .tag.attempt{background:#fff4de;color:#a86a00;}
+  .tag.success{background:var(--ok-bg);color:var(--ok);}
+  .tag.fail{background:var(--fail-bg);color:var(--fail);}
+  .tag.alt{background:var(--accent-bg);color:var(--accent);}
+
+  .branch-note{
+    background:#fff8e8;
+    border:1px solid #f1dfa9;
+    color:#8a6300;
+    font-size:.8rem;
+    padding:8px 12px;
+    border-radius:10px;
+    margin:10px 0;
+  }
+
+  .sub-spots{
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .sub-spot{
+    padding-left:12px;
+    border-left:2px solid var(--sea-300);
+  }
+  .sub-spot .sub-title{
+    font-weight:700;
+    font-size:.85rem;
+    color:var(--sea-700);
+  }
+  .sub-spot .desc{
+    font-size:.8rem;
+    color:var(--muted);
+    margin-top:2px;
+  }
+
+  /* Slider */
+  .slider{
+    margin-top:8px;
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+    background:#eef2f5;
+  }
+  .slider .track{
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+  }
+  .slider .track::-webkit-scrollbar{
+    display:none;
+    height:0;
+  }
+  .slider .track img{
+    flex:0 0 100%;
+    scroll-snap-align:center;
+    width:100%;
+    height:min(60vh, 360px);
+    object-fit:contain;
+    background:#dfe6ea;
+    display:block;
+    cursor:zoom-in;
+  }
+  .slider .arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:32px;
+    height:32px;
+    border:none;
+    border-radius:50%;
+    background:rgba(0,0,0,.45);
+    color:#fff;
+    font-size:1rem;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .slider .arrow:hover{background:rgba(0,0,0,.65);}
+  .slider .arrow.prev{left:8px;}
+  .slider .arrow.next{right:8px;}
+  .slider .dots{
+    position:absolute;
+    bottom:8px;
+    left:0;
+    right:0;
+    display:flex;
+    justify-content:center;
+    gap:5px;
+  }
+  .slider .dots span{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:rgba(255,255,255,.55);
+  }
+  .slider .dots span.on{background:#fff;}
+  .slider .count{
+    position:absolute;
+    top:8px;
+    right:8px;
+    background:rgba(0,0,0,.5);
+    color:#fff;
+    font-size:.68rem;
+    padding:2px 7px;
+    border-radius:999px;
+  }
+
+  /* Lightbox */
+  .lightbox{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.92);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+  }
+  .lightbox.open{display:flex;}
+  .lightbox img{
+    max-width:92vw;
+    max-height:82vh;
+    object-fit:contain;
+  }
+  .lightbox .lb-close{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:1.2rem;
+    cursor:pointer;
+  }
+  .lightbox .lb-arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:46px;
+    height:46px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:1.6rem;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .lightbox .lb-arrow:hover,
+  .lightbox .lb-close:hover{background:rgba(255,255,255,.24);}
+  .lightbox .lb-arrow.prev{left:12px;}
+  .lightbox .lb-arrow.next{right:12px;}
+  .lightbox .lb-count{
+    position:absolute;
+    bottom:20px;
+    left:0;
+    right:0;
+    text-align:center;
+    color:#fff;
+    font-size:.85rem;
+    opacity:.85;
+  }
+
+  h3.section-title{
+    font-size:1.05rem;
+    margin:32px 0 12px;
+    padding-left:2px;
+    border-left:4px solid var(--sea-500);
+    padding-left:10px;
+  }
+
+  .spot-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  @media(min-width:560px){
+    .spot-grid{grid-template-columns:1fr 1fr 1fr;}
+  }
+  .spot-card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .spot-card .thumb{
+    height:100px;
+    background:#dde7ee;
+  }
+  .spot-card .thumb img{
+    width:100%;height:100%;object-fit:cover;display:block;
+  }
+  .spot-card .info{
+    padding:8px 10px 10px;
+  }
+  .spot-card .info .name{
+    font-weight:700;
+    font-size:.85rem;
+  }
+  .spot-card .info .highlight{
+    font-size:.72rem;
+    color:var(--sea-500);
+    margin:3px 0 6px;
+  }
+  .facilities{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+  }
+  .facilities span{
+    font-size:.66rem;
+    padding:2px 6px;
+    border-radius:6px;
+    background:#f1f5f8;
+    color:var(--muted);
+  }
+  .facilities span.yes{background:var(--ok-bg);color:var(--ok);}
+  .facilities span.no{background:#f5f0f0;color:#b08a8a;}
+
+  .food-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .food-card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    background:#fff;
+  }
+  .food-card .name{font-weight:700;font-size:.92rem;}
+  .food-card .price{
+    font-size:.8rem;
+    color:var(--muted);
+    margin-top:4px;
+  }
+
+  .bonus-note{
+    font-size:.8rem;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+
+  .map-wrap{
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:#dfe9ee;
+  }
+  .map-wrap img{
+    display:block;
+    width:100%;
+    height:auto;
+    cursor:zoom-in;
+  }
+  .map-pin{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:var(--accent);
+    border:2px solid #fff;
+    box-shadow:0 1px 4px rgba(0,0,0,.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:.68rem;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .map-pin::after{
+    content:attr(data-name);
+    position:absolute;
+    bottom:130%;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.78);
+    color:#fff;
+    padding:3px 8px;
+    border-radius:6px;
+    font-size:.7rem;
+    font-weight:500;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .12s;
+  }
+  .map-pin:hover::after{opacity:1;}
+
+  .map-day-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:10px;
+  }
+  .map-day-btn{
+    flex:1;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    padding:8px 6px;
+    border-radius:10px;
+    font-size:.8rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .map-day-btn.active{
+    background:var(--sea-900);
+    border-color:var(--sea-900);
+    color:#fff;
+  }
+
+  .map-legend{
+    margin-top:10px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 14px;
+    font-size:.8rem;
+    color:var(--ink);
+  }
+  @media(min-width:560px){
+    .map-legend{grid-template-columns:1fr 1fr 1fr;}
+  }
+  .map-legend-item{
+    display:flex;
+    align-items:center;
+  }
+  .map-legend-item .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    color:#fff;
+    font-size:.65rem;
+    font-weight:800;
+    margin-right:6px;
+    flex:0 0 auto;
+  }
+
+  .ferry-scroll{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fff;
+  }
+  table.ferry{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.8rem;
+    white-space:nowrap;
+  }
+  table.ferry th{
+    background:var(--sea-100);
+    color:var(--sea-900);
+    font-weight:700;
+    text-align:left;
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  table.ferry td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+    color:var(--ink);
+  }
+  table.ferry tr:last-child td{border-bottom:none;}
+  table.ferry td.route{font-weight:700;color:var(--sea-700);}
+  table.ferry td.tel{color:var(--sea-500);font-weight:600;}
+  .ferry-note{
+    font-size:.76rem;
+    color:var(--muted);
+    margin-top:8px;
+  }
+
+  footer{
+    text-align:center;
+    font-size:.75rem;
+    color:var(--muted);
+    margin-top:40px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="logo-chip"><img src="img/logo.png" alt="울릉시티 로고"></div>
+  <h1>🏝️ 울릉도 여행 브리핑</h1>
+  <div class="goal-badges">
+    <span>🚩 목표1 · 독도 입성</span>
+    <span>🤿 목표2 · 스노클링</span>
+  </div>
+  <div class="dates">
+    <span>8/21(금) 울릉도 도착</span>
+    <span>8/22(토)</span>
+    <span>8/23(일)</span>
+    <span>8/24(월) 서울 복귀</span>
+  </div>
+</header>
+
+<nav class="tabbar" id="tabbar">
+  <button class="case-btn active" data-case="a">케이스 A<span class="em">금요일 독도 성공</span></button>
+  <button class="case-btn" data-case="b">케이스 B<span class="em">토요일 독도 성공</span></button>
+  <button class="case-btn" data-case="c">케이스 C<span class="em">일요일 최종 시도</span></button>
+</nav>
+
+<div class="wrap">
+
+  <!-- CASE A -->
+  <section class="case active" id="case-a">
+    <div class="case-summary">✅ <b>금요일 오후, 독도 입성 성공!</b> 이후 일정은 스노클링·관광 위주로 순조롭게 진행됩니다.</div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>금요일 · Day 1</h2><span class="date">8/21</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">11:00</div><div class="content"><div class="title">울릉도 도착</div><div class="desc">🛳️ 묵호 08:20 출발 → 도동 11:00 도착</div></div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">숙소 체크인 (호텔 섬앤썸)</div>
+          <div class="desc">도동항에서 도보 7분 · 짐만 맡기고 바로 이동</div>
+        </div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">독도 입도 <span class="tag success">성공</span></div>
+          <div class="desc">첫날 오후 시도에서 독도 입성 성공 · 왕복 약 3시간 소요</div>
+          <div class="desc">🚢 탑승 가능편: 저동 14:25 (썬라이즈호) 또는 사동 13:20 (독도드림호)</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>토요일 · Day 2</h2><span class="date">8/22</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">오전</div><div class="content">
+          <div class="title">행남해안산책로</div>
+          <div class="desc">도동 출발 → 저동 도착 해안코스, 1.9km · 약 1시간 소요</div>
+          <div class="slider" data-spot="행남해안산책로"></div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">거북바위</div>
+          <div class="desc">(스노클링 가능) 물 맑음 · 수심 깊음 · 넓은 공간 · 파도 거의 없음 · 소라 없음</div>
+          <div class="slider" data-spot="거북바위"></div>
+        </div></div>
+        <div class="item"><div class="time">점심</div><div class="content">
+          <div class="title">태양식당 따개비칼국수</div>
+          <div class="slider" data-spot="태양식당따개비칼국수"></div>
+        </div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">태하향목관광모노레일</div>
+          <div class="desc">대한민국 10대 비경 향목전망대, 편도 20분 · 오르막 완만한 편 · 전망대에서 대풍감 조망</div>
+          <div class="slider" data-spot="태하향목모노레일"></div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">서쪽 바다 스노클링</div>
+          <div class="sub-spots">
+            <div class="sub-spot">
+              <div class="sub-title">가재굴</div>
+              <div class="desc">다이빙 명소, 물고기 많음 · 수심 깊음 · 안전요원 없음 · 화장실·샤워장 X · 취사 불가</div>
+              <div class="slider" data-spot="가재굴"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">학포항</div>
+              <div class="desc">스노클링 명소 + 물고기, 그늘 O · 화장실·샤워장·장비대여 O</div>
+              <div class="slider" data-spot="학포항"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>일요일 · Day 3</h2><span class="date">8/23</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">오전</div><div class="content">
+          <div class="title">내수전일출전망대</div>
+          <div class="desc">편도 15분, 짧고 난이도 낮음 · 급경사 구간 나무계단</div>
+        </div></div>
+        <div class="item"><div class="time">점심</div><div class="content"><div class="title">저동에서 점심식사</div></div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">관음도</div>
+          <div class="desc">파란 연도교 건너 왕복 1시간 코스</div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">동쪽 바다 스노클링</div>
+          <div class="sub-spots">
+            <div class="sub-spot">
+              <div class="sub-title">와달리터널</div>
+              <div class="desc">정들포 전망대 아래쪽 해변 · 오전에 해 쨍쨍할 때 바다색이 예뻐서 더 좋음 · 와달리 휴게소에서 와달리터널로 가다 터널 종점으로 나가면 바로 우측</div>
+              <div class="slider" data-spot="와달리터널"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">삼선암</div>
+              <div class="desc">물고기 많음, 내려가는 길 험함 · 화장실·샤워장 X (근처 선창선착장 이용)</div>
+              <div class="desc">⚠️ 바다 상황에 따라 현장에서 입수 제한될 수 있음</div>
+              <div class="slider" data-spot="삼선암"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">선창선착장</div>
+              <div class="desc">스노클링 & 뿔소라 스팟 · 화장실 O · 샤워장 X</div>
+              <div class="slider" data-spot="선창선착장"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>월요일 · Day 4</h2><span class="date">8/24</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time"></div><div class="content"><div class="title">서울 복귀</div><div class="desc">🛳️ 도동 12:40 출발 → 묵호 15:20 도착</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASE B -->
+  <section class="case" id="case-b">
+    <div class="case-summary">🔁 <b>금요일 실패 → 토요일 오전, 독도 입성 성공!</b> 금요일 오후는 대체 일정(행남해안산책로)으로 진행되고, 토요일부터 원래 계획대로 흘러갑니다.</div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>금요일 · Day 1</h2><span class="date">8/21</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">11:00</div><div class="content"><div class="title">울릉도 도착</div><div class="desc">🛳️ 묵호 08:20 출발 → 도동 11:00 도착</div></div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">숙소 체크인 (호텔 섬앤썸)</div>
+          <div class="desc">도동항에서 도보 7분 · 짐만 맡기고 바로 이동</div>
+        </div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">독도 입도 시도 <span class="tag fail">실패</span></div>
+          <div class="desc">왕복 약 3시간 소요</div>
+        </div></div>
+        <div class="branch-note">⛔ 독도 실패 → 대체 일정으로 전환</div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">행남해안산책로 <span class="tag alt">대체일정</span></div>
+          <div class="desc">도동 출발 → 저동 도착 해안코스, 1.9km · 약 1시간 소요</div>
+          <div class="slider" data-spot="행남해안산책로"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>토요일 · Day 2</h2><span class="date">8/22</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">오전</div><div class="content">
+          <div class="title">독도 입도 재시도 <span class="tag success">성공</span></div>
+          <div class="desc">왕복 약 3시간 소요</div>
+        </div></div>
+        <div class="item"><div class="time">점심</div><div class="content"><div class="title">점심식사</div></div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">태하향목관광모노레일</div>
+          <div class="desc">대한민국 10대 비경 향목전망대, 편도 20분 · 오르막 완만한 편 · 전망대에서 대풍감 조망</div>
+          <div class="slider" data-spot="태하향목모노레일"></div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">서쪽 바다 스노클링 <span class="tag alt">가재굴 or 학포항</span></div>
+          <div class="desc">가재굴: 다이빙 명소·물고기 많음(화장실·샤워장 X) · 학포항: 스노클링 명소·그늘O(화장실·샤워장·장비대여 O)</div>
+          <div class="slider" data-spot="가재굴"></div>
+          <div class="slider" data-spot="학포항"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>일요일 · Day 3</h2><span class="date">8/23</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">오전</div><div class="content">
+          <div class="title">내수전일출전망대</div>
+          <div class="desc">편도 15분, 짧고 난이도 낮음 · 급경사 구간 나무계단</div>
+        </div></div>
+        <div class="item"><div class="time">점심</div><div class="content"><div class="title">저동에서 점심식사</div></div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">관음도</div>
+          <div class="desc">파란 연도교 건너 왕복 1시간 코스</div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">동쪽 바다 스노클링</div>
+          <div class="sub-spots">
+            <div class="sub-spot">
+              <div class="sub-title">와달리터널</div>
+              <div class="desc">정들포 전망대 아래쪽 해변 · 오전에 해 쨍쨍할 때 바다색이 예뻐서 더 좋음 · 와달리 휴게소에서 와달리터널로 가다 터널 종점으로 나가면 바로 우측</div>
+              <div class="slider" data-spot="와달리터널"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">삼선암</div>
+              <div class="desc">물고기 많음, 내려가는 길 험함 · 화장실·샤워장 X (근처 선창선착장 이용)</div>
+              <div class="desc">⚠️ 바다 상황에 따라 현장에서 입수 제한될 수 있음</div>
+              <div class="slider" data-spot="삼선암"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">선창선착장</div>
+              <div class="desc">스노클링 & 뿔소라 스팟 · 화장실 O · 샤워장 X</div>
+              <div class="slider" data-spot="선창선착장"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>월요일 · Day 4</h2><span class="date">8/24</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time"></div><div class="content"><div class="title">서울 복귀</div><div class="desc">🛳️ 도동 12:40 출발 → 묵호 15:20 도착</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASE C -->
+  <section class="case" id="case-c">
+    <div class="case-summary">⏳ <b>금·토 연속 실패 → 일요일 오전, 마지막 시도.</b> 이번이 마지막 기회이며, 성공/실패와 무관하게 이후 일정(관음도·동쪽 스노클링)은 동일하게 진행됩니다.</div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>금요일 · Day 1</h2><span class="date">8/21</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">11:00</div><div class="content"><div class="title">울릉도 도착</div><div class="desc">🛳️ 묵호 08:20 출발 → 도동 11:00 도착</div></div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">숙소 체크인 (호텔 섬앤썸)</div>
+          <div class="desc">도동항에서 도보 7분 · 짐만 맡기고 바로 이동</div>
+        </div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">독도 입도 시도 <span class="tag fail">실패</span></div>
+          <div class="desc">왕복 약 3시간 소요</div>
+        </div></div>
+        <div class="branch-note">⛔ 독도 실패 → 대체 일정으로 전환</div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">행남해안산책로 <span class="tag alt">대체일정</span></div>
+          <div class="desc">도동 출발 → 저동 도착 해안코스, 1.9km · 약 1시간 소요</div>
+          <div class="slider" data-spot="행남해안산책로"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>토요일 · Day 2</h2><span class="date">8/22</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">오전</div><div class="content">
+          <div class="title">독도 입도 재시도 <span class="tag fail">실패</span></div>
+          <div class="desc">왕복 약 3시간 소요</div>
+        </div></div>
+        <div class="item"><div class="time">점심</div><div class="content"><div class="title">점심식사</div></div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">태하향목관광모노레일</div>
+          <div class="desc">대한민국 10대 비경 향목전망대, 편도 20분 · 오르막 완만한 편 · 전망대에서 대풍감 조망</div>
+          <div class="slider" data-spot="태하향목모노레일"></div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">서쪽 바다 스노클링 <span class="tag alt">가재굴 or 학포항</span></div>
+          <div class="desc">가재굴: 다이빙 명소·물고기 많음(화장실·샤워장 X) · 학포항: 스노클링 명소·그늘O(화장실·샤워장·장비대여 O)</div>
+          <div class="slider" data-spot="가재굴"></div>
+          <div class="slider" data-spot="학포항"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>일요일 · Day 3</h2><span class="date">8/23</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time">오전</div><div class="content">
+          <div class="title">독도 입도 마지막 시도 <span class="tag attempt">최종 시도</span></div>
+          <div class="desc">이번이 마지막 기회 · 성공/실패와 무관하게 이후 일정은 동일하게 진행 · 왕복 약 3시간 소요</div>
+        </div></div>
+        <div class="item"><div class="time">점심</div><div class="content"><div class="title">저동에서 점심식사</div></div></div>
+        <div class="item"><div class="time">오후</div><div class="content">
+          <div class="title">관음도</div>
+          <div class="desc">파란 연도교 건너 왕복 1시간 코스</div>
+        </div></div>
+        <div class="item"><div class="time"></div><div class="content">
+          <div class="title">동쪽 바다 스노클링</div>
+          <div class="sub-spots">
+            <div class="sub-spot">
+              <div class="sub-title">와달리터널</div>
+              <div class="desc">정들포 전망대 아래쪽 해변 · 오전에 해 쨍쨍할 때 바다색이 예뻐서 더 좋음 · 와달리 휴게소에서 와달리터널로 가다 터널 종점으로 나가면 바로 우측</div>
+              <div class="slider" data-spot="와달리터널"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">삼선암</div>
+              <div class="desc">물고기 많음, 내려가는 길 험함 · 화장실·샤워장 X (근처 선창선착장 이용)</div>
+              <div class="desc">⚠️ 바다 상황에 따라 현장에서 입수 제한될 수 있음</div>
+              <div class="slider" data-spot="삼선암"></div>
+            </div>
+            <div class="sub-spot">
+              <div class="sub-title">선창선착장</div>
+              <div class="desc">스노클링 & 뿔소라 스팟 · 화장실 O · 샤워장 X</div>
+              <div class="slider" data-spot="선창선착장"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head"><h2>월요일 · Day 4</h2><span class="date">8/24</span></div>
+      <div class="day-body">
+        <div class="item"><div class="time"></div><div class="content"><div class="title">서울 복귀</div><div class="desc">🛳️ 도동 12:40 출발 → 묵호 15:20 도착</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 여행 지도 -->
+  <h3 class="section-title">🗺️ 여행 지도</h3>
+  <div class="map-day-tabs" id="map-day-tabs">
+    <button class="map-day-btn" data-day="1">금요일 Day1</button>
+    <button class="map-day-btn" data-day="2">토요일 Day2</button>
+    <button class="map-day-btn" data-day="3">일요일 Day3</button>
+  </div>
+  <div class="map-wrap" id="map-wrap">
+    <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
+  </div>
+  <div class="map-legend" id="map-legend"></div>
+
+  <!-- 묵호-울릉도 배편 정보 -->
+  <h3 class="section-title">🛳️ 묵호 ↔ 울릉도(도동) 배편</h3>
+  <div class="ferry-scroll">
+    <table class="ferry">
+      <thead>
+        <tr>
+          <th>구간</th>
+          <th>출항</th>
+          <th>도착</th>
+          <th>소요시간</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="route">묵호 → 울릉도(도동)</td>
+          <td>08:20</td>
+          <td>11:00</td>
+          <td>2시간 40분</td>
+        </tr>
+        <tr>
+          <td class="route">울릉도(도동) → 묵호</td>
+          <td>12:40</td>
+          <td>15:20</td>
+          <td>2시간 40분</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 독도 배편 정보 -->
+  <h3 class="section-title">🚢 독도 배편 정보</h3>
+  <div class="ferry-scroll">
+    <table class="ferry">
+      <thead>
+        <tr>
+          <th>구간</th>
+          <th>선박명</th>
+          <th>운항사</th>
+          <th>정원</th>
+          <th>출항시간</th>
+          <th>소요시간</th>
+          <th>전화번호</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="route">울릉(저동) → 독도</td>
+          <td>썬라이즈호</td>
+          <td>㈜대저해운</td>
+          <td>442명</td>
+          <td>08:20, 14:25</td>
+          <td>1시간 30분</td>
+          <td class="tel">1899-8114</td>
+        </tr>
+        <tr>
+          <td class="route">울릉(사동) → 독도</td>
+          <td>독도드림호</td>
+          <td>독도크루즈(주)</td>
+          <td>444명</td>
+          <td>06:30, 13:20</td>
+          <td>1시간 45분</td>
+          <td class="tel">1533-3370</td>
+        </tr>
+        <tr>
+          <td class="route">울릉(도동) → 독도</td>
+          <td>씨스타 1호</td>
+          <td>씨스포빌(주)</td>
+          <td>442명</td>
+          <td>12:30</td>
+          <td>1시간 45분</td>
+          <td class="tel">1577-8665</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="ferry-note">출항 선착장(저동/사동/도동)마다 배편이 다르니 예약 전 확인 필요 · 기상 상황에 따라 결항될 수 있음</p>
+
+  <!-- 스노클링 포인트 총정리 -->
+  <h3 class="section-title">🤿 스노클링 포인트 총정리</h3>
+  <div class="spot-grid" id="spot-grid"></div>
+
+  <!-- 맛집 -->
+  <h3 class="section-title">🍽️ 맛집 &amp; 예산 메모</h3>
+  <div class="food-list">
+    <div class="food-card">
+      <div class="name">신비섬횟집</div>
+      <div class="price">물회</div>
+      <div class="slider" data-spot="신비섬횟집"></div>
+    </div>
+    <div class="food-card">
+      <div class="name">오징어회타운</div>
+      <div class="price">오징어회&amp;독도새우 · 오징어회 1마리 약 1만원 / 만금물산 독도새우 500g 15만원(10~15마리) / 광어 1.5kg 7.5만원 / 2층 초장집 상차림비 1인 5천원, 새우머리튀김 1만원</div>
+    </div>
+    <div class="food-card">
+      <div class="name">천금수산</div>
+      <div class="price">독도새우 3인 22.5만원 (머리튀김 포함)</div>
+    </div>
+    <div class="food-card">
+      <div class="name">울릉가</div>
+      <div class="price">독도새우 3인 23만원 (머리튀김, 새우탕 포함) / 회+독도새우세트 3인 18만원 (독도새우 1인 3마리)</div>
+    </div>
+  </div>
+
+  <!-- 추가 후보지 -->
+  <h3 class="section-title">📌 추가 방문 후보지</h3>
+  <p class="bonus-note">일정에는 아직 배정되지 않았지만 사진이 준비된 후보 스팟입니다.</p>
+  <div class="spot-grid" id="bonus-grid"></div>
+
+</div>
+
+<footer>울릉도 여행 브리핑 · 개인용 자료</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" type="button" aria-label="닫기">✕</button>
+  <button class="lb-arrow prev" type="button" aria-label="이전 사진">‹</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="lb-arrow next" type="button" aria-label="다음 사진">›</button>
+  <div class="lb-count" id="lightbox-count"></div>
+</div>
+
+<script>
+// 여행 지도 위 마커 좌표 (울릉도관광지도.jpg 기준 % 위치)
+const MAP_PIN_POS = {
+  "대풍감": {left:7.38, top:26.60},
+  "태하향목모노레일": {left:10.37, top:31.92},
+  "학포항": {left:12.83, top:39.16},
+  "가재굴": {left:8.79, top:29.69},
+  "거북바위": {left:49.23, top:62.10},
+  "행남해안산책로": {left:82.98, top:47.31},
+  "삼선암": {left:79.82, top:11.38},
+  "관음도": {left:87.20, top:12.12},
+  "선창선착장": {left:78.24, top:14.10},
+  "도동항": {left:80.87, top:48.39},
+  "내수전일출전망대": {left:82.98, top:31.42},
+  "와달리터널": {left:78.06, top:18.80},
+};
+
+// 케이스별 · 날짜별 방문 순서 (배열 순서 = 방문 순서, 지도 핀 번호로 표시됨)
+const CASE_ITINERARY = {
+  a: {
+    1: ["도동항"],
+    2: ["행남해안산책로","거북바위","태하향목모노레일","가재굴","학포항"],
+    3: ["내수전일출전망대","관음도","와달리터널","삼선암","선창선착장"],
+  },
+  b: {
+    1: ["도동항","행남해안산책로"],
+    2: ["태하향목모노레일","가재굴","학포항"],
+    3: ["내수전일출전망대","관음도","와달리터널","삼선암","선창선착장"],
+  },
+  c: {
+    1: ["도동항","행남해안산책로"],
+    2: ["태하향목모노레일","가재굴","학포항"],
+    3: ["내수전일출전망대","관음도","와달리터널","삼선암","선창선착장"],
+  },
+};
+
+const DAY_META = {
+  1: {label:"금요일 Day1", color:"#f2994a"},
+  2: {label:"토요일 Day2", color:"#00c189"},
+  3: {label:"일요일 Day3", color:"#2f80ed"},
+};
+
+const mapWrap = document.getElementById("map-wrap");
+const mapLegend = document.getElementById("map-legend");
+const mapDayTabs = document.getElementById("map-day-tabs");
+let currentCase = "a";
+let currentDay = 1;
+
+function renderMapPins(){
+  mapWrap.querySelectorAll(".map-pin").forEach(el=>el.remove());
+  mapLegend.innerHTML = "";
+
+  const names = CASE_ITINERARY[currentCase][currentDay] || [];
+  const meta = DAY_META[currentDay];
+
+  names.forEach((name, i)=>{
+    const pos = MAP_PIN_POS[name];
+    if(!pos) return;
+    const num = i + 1;
+
+    const el = document.createElement("div");
+    el.className = "map-pin";
+    el.style.left = pos.left + "%";
+    el.style.top = pos.top + "%";
+    el.style.background = meta.color;
+    el.textContent = num;
+    el.dataset.name = name;
+    el.title = name;
+    mapWrap.appendChild(el);
+
+    const legendItem = document.createElement("div");
+    legendItem.className = "map-legend-item";
+    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${name}`;
+    mapLegend.appendChild(legendItem);
+  });
+}
+
+function setMapDay(day){
+  currentDay = day;
+  mapDayTabs.querySelectorAll(".map-day-btn").forEach(b=>{
+    b.classList.toggle("active", Number(b.dataset.day) === day);
+  });
+  renderMapPins();
+}
+
+mapDayTabs.addEventListener("click", e=>{
+  const btn = e.target.closest(".map-day-btn");
+  if(!btn) return;
+  setMapDay(Number(btn.dataset.day));
+});
+
+setMapDay(1);
+document.getElementById("map-img").addEventListener("click", ()=>{
+  openLightbox(["울릉도관광지도.jpg"], 0);
+});
+
+// 관광지별 이미지 (img 폴더 기준, 추가되는 대로 여기 배열에 채워넣으면 자동 반영됨)
+const SPOT_IMAGES = {
+  "행남해안산책로": ["행남해안산책로_01.jpg","행남해안산책로_012jpg.jpg","행남해안산책로_02jpg.jpg","행남해안산책로_03jpg.jpg","행남해안산책로_04jpg.jpg"],
+  "거북바위": ["거북바위_01.jpeg","거북바위_02.png"],
+  "태하향목모노레일": ["태하향목모노레일_01.jpg","대풍감_01.png","대풍감_02.jpg"],
+  "가재굴": ["가재굴_01.jpg","가재굴_02.jpg","가재굴_03.png"],
+  "학포항": ["학포항_01.png","학포항_02.jpg","학포항_03.jpg","학포항_04.jpg"],
+  "와달리터널": ["와달리터널_01.jpg","와달리터널_02.jpg"],
+  "삼선암": ["삼선암_01.png"],
+  "선창선착장": ["선창선착장_01.png","선창선착장_02.png"],
+  "태양식당따개비칼국수": ["태양식당따개비칼국수_01.jpg","태양식당따개비칼국수_02.jpg","태양식당따개비칼국수_03.jpg"],
+  "신비섬횟집": ["신비섬횟집_01.jpg","신비섬횟집_02.jpg","신비섬횟집_03.jpg"]
+};
+
+// 스노클링 포인트 정보 (여행계획.txt 하단 정리 기준)
+const SNORKEL_SPOTS = [
+  {name:"거북바위", highlight:"물 맑음·수심 깊음·넓은 공간·파도 거의 없음·소라 없음", toilet:true, shower:true, rent:true, cook:true},
+  {name:"곰바위터널", highlight:"", toilet:true, shower:true, rent:null, cook:null},
+  {name:"학포항", highlight:"스노클링 명소 + 물고기, 그늘 O", toilet:true, shower:true, rent:true, cook:null},
+  {name:"가재굴", highlight:"다이빙 명소, 물고기 많음", toilet:false, shower:false, rent:null, cook:false},
+  {name:"울릉독도해양연구기지", highlight:"뿔소라 스팟 (큰 뿔소라 많음) · 방파제 안쪽이라 파도 없고 수심 안정적", toilet:true, shower:true, rent:false, cook:true},
+  {name:"현포항", highlight:"", toilet:true, shower:false, rent:null, cook:null},
+  {name:"천부항", highlight:"방파제로 파도 세지 않음·물살 잔잔·수심 얕음, 해수풀장, 공영주차장 무료", toilet:true, shower:true, rent:true, cook:null},
+  {name:"죽암몽돌해변", highlight:"그늘 O", toilet:true, shower:false, rent:null, cook:null},
+  {name:"선창선착장", highlight:"스노클링 & 뿔소라 스팟", toilet:true, shower:false, rent:null, cook:null},
+  {name:"내수전몽돌해변", highlight:"아쿠아슈즈 필수", toilet:true, shower:true, rent:true, cook:null},
+  {name:"사동해수욕장", highlight:"", toilet:true, shower:true, rent:true, cook:null},
+];
+
+function facilityBadge(label, val){
+  const cls = val===true ? "yes" : val===false ? "no" : "";
+  const mark = val===true ? "O" : val===false ? "X" : "?";
+  return `<span class="${cls}">${label} ${mark}</span>`;
+}
+
+function buildSlider(container, images){
+  if(!images || images.length===0){
+    container.style.display = "none";
+    return;
+  }
+  const track = document.createElement("div");
+  track.className = "track";
+  images.forEach((src,i)=>{
+    const img = document.createElement("img");
+    img.src = "img/" + src;
+    img.loading = "lazy";
+    img.alt = "";
+    img.addEventListener("click", ()=> openLightbox(images, i));
+    track.appendChild(img);
+  });
+  container.appendChild(track);
+
+  if(images.length > 1){
+    const dots = document.createElement("div");
+    dots.className = "dots";
+    images.forEach((_,i)=>{
+      const d = document.createElement("span");
+      if(i===0) d.className = "on";
+      dots.appendChild(d);
+    });
+    container.appendChild(dots);
+
+    const count = document.createElement("div");
+    count.className = "count";
+    count.textContent = "1/" + images.length;
+    container.appendChild(count);
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "arrow prev";
+    prevBtn.type = "button";
+    prevBtn.setAttribute("aria-label","이전 사진");
+    prevBtn.textContent = "‹";
+    container.appendChild(prevBtn);
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "arrow next";
+    nextBtn.type = "button";
+    nextBtn.setAttribute("aria-label","다음 사진");
+    nextBtn.textContent = "›";
+    container.appendChild(nextBtn);
+
+    const goTo = (idx)=>{
+      idx = Math.max(0, Math.min(images.length - 1, idx));
+      track.scrollTo({left: idx * track.clientWidth, behavior:"smooth"});
+    };
+    const currentIndex = ()=> Math.round(track.scrollLeft / track.clientWidth);
+
+    prevBtn.addEventListener("click", ()=> goTo(currentIndex() - 1));
+    nextBtn.addEventListener("click", ()=> goTo(currentIndex() + 1));
+
+    track.addEventListener("scroll", ()=>{
+      const idx = currentIndex();
+      [...dots.children].forEach((d,i)=>d.classList.toggle("on", i===idx));
+      count.textContent = (idx+1) + "/" + images.length;
+      prevBtn.style.visibility = idx===0 ? "hidden" : "visible";
+      nextBtn.style.visibility = idx===images.length-1 ? "hidden" : "visible";
+    });
+    prevBtn.style.visibility = "hidden";
+  }
+}
+
+// 일정 카드 안의 슬라이더 초기화
+document.querySelectorAll(".slider[data-spot]").forEach(el=>{
+  buildSlider(el, SPOT_IMAGES[el.dataset.spot]);
+});
+
+// 스노클링 포인트 카드 렌더링
+const spotGrid = document.getElementById("spot-grid");
+SNORKEL_SPOTS.forEach(spot=>{
+  const card = document.createElement("div");
+  card.className = "spot-card";
+  const imgs = SPOT_IMAGES[spot.name];
+  card.innerHTML = `
+    <div class="thumb">${imgs ? `<img src="img/${imgs[0]}" loading="lazy" alt="">` : ""}</div>
+    <div class="info">
+      <div class="name">${spot.name}</div>
+      <div class="highlight">${spot.highlight || ""}</div>
+      <div class="facilities">
+        ${facilityBadge("화장실", spot.toilet)}
+        ${facilityBadge("샤워", spot.shower)}
+        ${spot.rent!==null ? facilityBadge("장비대여", spot.rent) : ""}
+        ${spot.cook!==null ? facilityBadge("취사", spot.cook) : ""}
+      </div>
+    </div>
+  `;
+  spotGrid.appendChild(card);
+});
+
+// 추가 후보지 (일정에 아직 없는 스팟, 사진만 있는 것)
+const ASSIGNED = new Set(["행남해안산책로","거북바위","태하향목모노레일","가재굴","학포항","와달리터널","삼선암","선창선착장"]);
+const bonusGrid = document.getElementById("bonus-grid");
+Object.keys(SPOT_IMAGES).filter(name=>!ASSIGNED.has(name)).forEach(name=>{
+  const imgs = SPOT_IMAGES[name];
+  const card = document.createElement("div");
+  card.className = "spot-card";
+  card.innerHTML = `
+    <div class="thumb"><img src="img/${imgs[0]}" loading="lazy" alt=""></div>
+    <div class="info"><div class="name">${name}</div></div>
+  `;
+  bonusGrid.appendChild(card);
+});
+if(bonusGrid.children.length===0){
+  bonusGrid.parentElement.querySelector(".bonus-note").textContent = "현재 없음";
+}
+
+// 탭 전환
+document.getElementById("tabbar").addEventListener("click", e=>{
+  const btn = e.target.closest(".case-btn");
+  if(!btn) return;
+  document.querySelectorAll(".case-btn").forEach(b=>b.classList.toggle("active", b===btn));
+  document.querySelectorAll("section.case").forEach(s=>s.classList.toggle("active", s.id === "case-" + btn.dataset.case));
+  currentCase = btn.dataset.case;
+  renderMapPins();
+});
+
+// 라이트박스 (사진 크게 보기)
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightbox-img");
+const lightboxCount = document.getElementById("lightbox-count");
+const lbPrev = lightbox.querySelector(".lb-arrow.prev");
+const lbNext = lightbox.querySelector(".lb-arrow.next");
+const lbClose = lightbox.querySelector(".lb-close");
+let lbImages = [];
+let lbIndex = 0;
+
+function updateLightbox(){
+  lightboxImg.src = "img/" + lbImages[lbIndex];
+  lightboxCount.textContent = (lbIndex+1) + "/" + lbImages.length;
+  lbPrev.style.visibility = lbIndex===0 ? "hidden" : "visible";
+  lbNext.style.visibility = lbIndex===lbImages.length-1 ? "hidden" : "visible";
+}
+
+function openLightbox(images, index){
+  lbImages = images;
+  lbIndex = index;
+  updateLightbox();
+  lightbox.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLightbox(){
+  lightbox.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+lbPrev.addEventListener("click", ()=>{ if(lbIndex>0){ lbIndex--; updateLightbox(); } });
+lbNext.addEventListener("click", ()=>{ if(lbIndex<lbImages.length-1){ lbIndex++; updateLightbox(); } });
+lbClose.addEventListener("click", closeLightbox);
+lightbox.addEventListener("click", e=>{ if(e.target === lightbox) closeLightbox(); });
+document.addEventListener("keydown", e=>{
+  if(!lightbox.classList.contains("open")) return;
+  if(e.key === "Escape") closeLightbox();
+  if(e.key === "ArrowLeft") lbPrev.click();
+  if(e.key === "ArrowRight") lbNext.click();
+});
+</script>
+
+</body>
+</html>
