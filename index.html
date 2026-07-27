@@ -734,8 +734,16 @@
     grid-template-columns:1fr;
     gap:14px;
   }
-  @media(min-width:640px){
-    .packing-grid{grid-template-columns:1fr 1fr;}
+  .packing-group-title{
+    font-size:.9rem;
+    font-weight:700;
+    color:var(--sea-700);
+    margin:22px 0 12px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--line);
+  }
+  .packing-group-title:first-child{
+    margin-top:0;
   }
   .packing-card{
     background:var(--card);
@@ -1711,29 +1719,29 @@ document.addEventListener("keydown", e=>{
 // 준비물 체크리스트
 // ══════════════════════════════════════════════
 const PACKING_LIST = [
-  { title: "공용", groups: [
+  { title: "공용", group: "공용", groups: [
     { items: ["지퍼백","일회용 비닐봉지","일회용 젓가락, 숟가락","과도","캠핑버너","냄비","바르는 모기약"] },
     { label: "상비약 (멀미약 제외)", items: ["소염진통제","타이레놀","지사제","알러지약","소화제","상처연고","일회용밴드"] },
   ]},
-  { title: "개인 · 생활용품", groups: [
+  { title: "개인 · 생활용품", group: "개인", groups: [
     { items: ["신분증","목베개","물티슈","휴지","팬티라이너 및 생리대","양우산"] },
   ]},
-  { title: "개인 · 전자기기", groups: [
+  { title: "개인 · 전자기기", group: "개인", groups: [
     { items: ["보조배터리","휴대폰 충전기","개인 카메라 및 충전기 / 필름카메라","고데기","손풍기"] },
   ]},
-  { title: "개인 · 의류", groups: [
+  { title: "개인 · 의류", group: "개인", groups: [
     { items: ["옷","잠옷","속옷","양말","슬리퍼","선글라스","모자"] },
   ]},
-  { title: "개인 · 물놀이", groups: [
+  { title: "개인 · 물놀이", group: "개인", groups: [
     { items: ["수영복","래시가드 및 판초 등 커버업","오리발","스노클 & 마스크","물놀이가방 (매쉬나 방수 등)","아쿠아슈즈"] },
   ]},
-  { title: "개인 · 상비약", groups: [
+  { title: "개인 · 상비약", group: "개인", groups: [
     { items: ["멀미약","피로회복제 및 개인 영양제"] },
   ]},
-  { title: "개인 · 화장품", groups: [
+  { title: "개인 · 화장품", group: "개인", groups: [
     { items: ["기초화장품","색조화장품","알로에젤","워터프루프 선크림&선스틱","마스크팩","스킨패드","핸드크림","헤어에센스","립밤","눈썹칼"] },
   ]},
-  { title: "개인 · 세면도구", groups: [
+  { title: "개인 · 세면도구", group: "개인", groups: [
     { items: ["화장솜","클렌징워터/밀크/티슈 (워터프루프라 2차세안 필요할듯)","클렌징폼","샴푸&린스","칫솔&치약","바디워시","샤워타올","수건","면도기"] },
   ]},
 ];
@@ -1751,7 +1759,15 @@ function packingItemKey(cat, item){
 }
 
 function renderPacking(){
-  packingGrid.innerHTML = PACKING_LIST.map(cat=>{
+  let lastGroup = null;
+  const pieces = [];
+
+  PACKING_LIST.forEach(cat=>{
+    if(cat.group !== lastGroup){
+      pieces.push(`<h4 class="packing-group-title">${cat.group === "공용" ? "👥 공용" : "🎒 개인"}</h4>`);
+      lastGroup = cat.group;
+    }
+
     const groupsHtml = cat.groups.map(g=>{
       const itemsHtml = g.items.map(item=>{
         const key = packingItemKey(cat.title, item);
@@ -1766,12 +1782,15 @@ function renderPacking(){
 
     const total = cat.groups.reduce((s,g)=>s+g.items.length, 0);
     const done = cat.groups.reduce((s,g)=>s+g.items.filter(item=>packingChecked[packingItemKey(cat.title,item)]).length, 0);
+    const displayTitle = cat.title.replace(/^개인 · /, "");
 
-    return `<div class="packing-card">
-      <div class="packing-card-head"><h4>${cat.title}</h4><span class="cnt">${done}/${total}</span></div>
+    pieces.push(`<div class="packing-card">
+      <div class="packing-card-head"><h4>${displayTitle}</h4><span class="cnt">${done}/${total}</span></div>
       <div class="packing-card-body">${groupsHtml}</div>
-    </div>`;
-  }).join("");
+    </div>`);
+  });
+
+  packingGrid.innerHTML = pieces.join("");
 
   updatePackingSummary();
 }
