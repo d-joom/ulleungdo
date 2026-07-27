@@ -111,8 +111,8 @@
     border-radius:8px;
   }
 
-  /* Tabs */
-  .tabbar{
+  /* Main category tabs */
+  .main-tabbar{
     position:sticky;
     top:0;
     z-index:20;
@@ -125,35 +125,63 @@
     margin:0 auto;
     overflow-x:auto;
   }
-  .tabbar button{
+  .main-tab-btn{
     flex:1;
-    min-width:120px;
+    min-width:88px;
     border:1px solid var(--line);
     background:#fff;
     color:var(--muted);
-    padding:10px 8px;
+    padding:10px 10px;
     border-radius:10px;
     font-size:.8rem;
-    font-weight:600;
+    font-weight:700;
     cursor:pointer;
-    line-height:1.3;
+    white-space:nowrap;
   }
-  .tabbar button .em{
-    display:block;
-    font-size:.72rem;
-    font-weight:400;
-    margin-top:2px;
-    opacity:.8;
-  }
-  .tabbar button.active{
+  .main-tab-btn.active{
     background:var(--sea-500);
     border-color:var(--sea-500);
     color:#fff;
   }
 
+  section.main-panel{
+    display:none;
+  }
+  section.main-panel.active{
+    display:block;
+    padding-top:18px;
+  }
+
+  /* 일정 탭 안 케이스 선택 드롭다운 (우측 상단) */
+  .itinerary-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .itinerary-head h3.section-title{
+    margin:0;
+  }
+  .case-select{
+    background:var(--sea-900);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:8px 12px;
+    font-size:.8rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .case-select:focus{
+    outline:2px solid var(--sea-500);
+    outline-offset:2px;
+  }
+
   section.case{
     display:none;
-    padding-top:18px;
+    padding-top:6px;
   }
   section.case.active{
     display:block;
@@ -774,13 +802,26 @@
   </div>
 </header>
 
-<nav class="tabbar" id="tabbar">
-  <button class="case-btn active" data-case="a">케이스 A<span class="em">금요일 독도 성공</span></button>
-  <button class="case-btn" data-case="b">케이스 B<span class="em">토요일 독도 성공</span></button>
-  <button class="case-btn" data-case="c">케이스 C<span class="em">일요일 최종 시도</span></button>
+<nav class="main-tabbar" id="mainTabbar">
+  <button class="main-tab-btn active" data-tab="itinerary">📅 일정</button>
+  <button class="main-tab-btn" data-tab="transport">🚄 교통</button>
+  <button class="main-tab-btn" data-tab="snorkel">🤿 스노클링</button>
+  <button class="main-tab-btn" data-tab="food">🍽️ 맛집</button>
+  <button class="main-tab-btn" data-tab="packing">🎒 준비물</button>
 </nav>
 
 <div class="wrap">
+
+  <!-- 일정 -->
+  <section class="main-panel active" id="panel-itinerary">
+  <div class="itinerary-head">
+    <h3 class="section-title" style="margin-top:0">📅 여행 일정</h3>
+    <select class="case-select" id="caseSelect">
+      <option value="a">케이스 A · 금요일 독도 성공</option>
+      <option value="b">케이스 B · 토요일 독도 성공</option>
+      <option value="c">케이스 C · 일요일 최종 시도</option>
+    </select>
+  </div>
 
   <!-- CASE A -->
   <section class="case active" id="case-a">
@@ -1079,9 +1120,13 @@
     <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
   </div>
   <div class="map-legend" id="map-legend"></div>
+  </section>
+  <!-- /일정 -->
 
+  <!-- 교통 -->
+  <section class="main-panel" id="panel-transport">
   <!-- 서울-묵호 기차 예매 정보 -->
-  <h3 class="section-title">🚄 서울 ↔ 묵호 기차 (예매 완료)</h3>
+  <h3 class="section-title" style="margin-top:0">🚄 서울 ↔ 묵호 기차 (예매 완료)</h3>
   <div class="ferry-scroll">
     <table class="ferry">
       <thead>
@@ -1197,13 +1242,24 @@
     </table>
   </div>
   <p class="ferry-note">출항 선착장(저동/사동/도동)마다 배편이 다르니 예약 전 확인 필요 · 기상 상황에 따라 결항될 수 있음</p>
+  </section>
+  <!-- /교통 -->
 
-  <!-- 스노클링 포인트 총정리 -->
-  <h3 class="section-title">🤿 스노클링 포인트 총정리</h3>
+  <!-- 스노클링 -->
+  <section class="main-panel" id="panel-snorkel">
+  <h3 class="section-title" style="margin-top:0">🤿 스노클링 포인트 총정리</h3>
   <div class="spot-grid" id="spot-grid"></div>
 
+  <!-- 추가 후보지 -->
+  <h3 class="section-title">📌 추가 방문 후보지</h3>
+  <p class="bonus-note">일정에는 아직 배정되지 않았지만 사진이 준비된 후보 스팟입니다.</p>
+  <div class="spot-grid" id="bonus-grid"></div>
+  </section>
+  <!-- /스노클링 -->
+
   <!-- 맛집 -->
-  <h3 class="section-title">🍽️ 맛집 &amp; 예산 메모</h3>
+  <section class="main-panel" id="panel-food">
+  <h3 class="section-title" style="margin-top:0">🍽️ 맛집 &amp; 예산 메모</h3>
   <div class="food-list">
     <div class="food-card">
       <div class="name">신비섬횟집</div>
@@ -1223,20 +1279,20 @@
       <div class="price">독도새우 3인 23만원 (머리튀김, 새우탕 포함) / 회+독도새우세트 3인 18만원 (독도새우 1인 3마리)</div>
     </div>
   </div>
+  </section>
+  <!-- /맛집 -->
 
   <!-- 준비물 -->
-  <h3 class="section-title">🎒 준비물</h3>
+  <section class="main-panel" id="panel-packing">
+  <h3 class="section-title" style="margin-top:0">🎒 준비물</h3>
   <div class="packing-summary">
     <span>준비 완료 <b id="packingCount">0/0</b></span>
     <div class="packing-summary-bar"><div class="packing-summary-fill" id="packingFill"></div></div>
   </div>
   <div class="packing-grid" id="packing-grid"></div>
   <p class="packing-note">🍜 컵라면 등은 현지에서 구매</p>
-
-  <!-- 추가 후보지 -->
-  <h3 class="section-title">📌 추가 방문 후보지</h3>
-  <p class="bonus-note">일정에는 아직 배정되지 않았지만 사진이 준비된 후보 스팟입니다.</p>
-  <div class="spot-grid" id="bonus-grid"></div>
+  </section>
+  <!-- /준비물 -->
 
 </div>
 
@@ -1491,13 +1547,19 @@ if(bonusGrid.children.length===0){
   bonusGrid.parentElement.querySelector(".bonus-note").textContent = "현재 없음";
 }
 
-// 탭 전환
-document.getElementById("tabbar").addEventListener("click", e=>{
-  const btn = e.target.closest(".case-btn");
+// 메인 카테고리 탭 전환 (일정/교통/스노클링/맛집/준비물)
+document.getElementById("mainTabbar").addEventListener("click", e=>{
+  const btn = e.target.closest(".main-tab-btn");
   if(!btn) return;
-  document.querySelectorAll(".case-btn").forEach(b=>b.classList.toggle("active", b===btn));
-  document.querySelectorAll("section.case").forEach(s=>s.classList.toggle("active", s.id === "case-" + btn.dataset.case));
-  currentCase = btn.dataset.case;
+  document.querySelectorAll(".main-tab-btn").forEach(b=>b.classList.toggle("active", b===btn));
+  document.querySelectorAll("section.main-panel").forEach(p=>p.classList.toggle("active", p.id === "panel-" + btn.dataset.tab));
+});
+
+// 케이스 선택 (일정 탭 내 드롭다운)
+document.getElementById("caseSelect").addEventListener("change", e=>{
+  const val = e.target.value;
+  document.querySelectorAll("section.case").forEach(s=>s.classList.toggle("active", s.id === "case-" + val));
+  currentCase = val;
   renderMapPins();
 });
 
