@@ -1468,7 +1468,7 @@ const SPOT_IMAGES = {
 
 // 스노클링 포인트 정보 (여행계획.txt 하단 정리 기준)
 const SNORKEL_SPOTS = [
-  {name:"거북바위", highlight:"물 맑음·수심 깊음·넓은 공간·파도 거의 없음·소라 없음", toilet:true, shower:true, rent:true, cook:true},
+  {name:"거북바위", highlight:"물 맑음·수심 깊음·넓은 공간·파도 거의 없음·소라 없음", toilet:true, shower:true, rent:true, cook:true, inTrip:true},
   {name:"곰바위터널", highlight:"", toilet:true, shower:true, rent:null, cook:null},
   {name:"학포항", highlight:"스노클링 명소 + 물고기, 그늘 O", toilet:true, shower:true, rent:true, cook:null, inTrip:true},
   {name:"가재굴", highlight:"다이빙 명소, 물고기 많음", toilet:false, shower:false, rent:null, cook:false, inTrip:true},
@@ -1560,9 +1560,10 @@ document.querySelectorAll(".slider[data-spot]").forEach(el=>{
   buildSlider(el, SPOT_IMAGES[el.dataset.spot]);
 });
 
-// 스노클링 포인트 카드 렌더링
+// 스노클링 포인트 카드 렌더링 (일정 포함 스팟을 최상단으로 정렬)
 const spotGrid = document.getElementById("spot-grid");
-SNORKEL_SPOTS.forEach(spot=>{
+const sortedSnorkelSpots = [...SNORKEL_SPOTS].sort((a,b)=> (b.inTrip?1:0) - (a.inTrip?1:0));
+sortedSnorkelSpots.forEach(spot=>{
   const card = document.createElement("div");
   card.className = "spot-card";
   const imgs = SPOT_IMAGES[spot.name];
