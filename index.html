@@ -635,6 +635,119 @@
     line-height:1.9;
   }
 
+  /* 준비물 */
+  .packing-summary{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--sea-100);
+    border:1px solid #cfe6f3;
+    border-radius:var(--radius);
+    padding:12px 16px;
+    margin-bottom:16px;
+    font-size:.85rem;
+    color:var(--sea-900);
+  }
+  .packing-summary b{
+    font-family:'GmarketSans','Pretendard',sans-serif;
+    font-size:1rem;
+  }
+  .packing-summary-bar{
+    flex:1;
+    height:8px;
+    background:#fff;
+    border-radius:999px;
+    overflow:hidden;
+    border:1px solid #cfe6f3;
+  }
+  .packing-summary-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--accent), var(--sea-500));
+    border-radius:999px;
+    width:0%;
+    transition:width .3s ease;
+  }
+  .packing-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  @media(min-width:640px){
+    .packing-grid{grid-template-columns:1fr 1fr;}
+  }
+  .packing-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(10,37,64,.06);
+  }
+  .packing-card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    background:var(--sea-900);
+    color:#fff;
+  }
+  .packing-card-head h4{
+    margin:0;
+    font-family:'GmarketSans','Pretendard',sans-serif;
+    font-weight:500;
+    font-size:.92rem;
+  }
+  .packing-card-head .cnt{
+    font-size:.72rem;
+    font-weight:700;
+    opacity:.85;
+    font-feature-settings:'tnum';
+  }
+  .packing-card-body{
+    padding:12px 14px 14px;
+  }
+  .packing-subhead{
+    font-size:.72rem;
+    font-weight:700;
+    color:var(--sea-500);
+    margin:10px 0 6px;
+  }
+  .packing-subhead:first-child{margin-top:0;}
+  .packing-items{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+  }
+  .packing-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:.8rem;
+    background:var(--sea-100);
+    padding:6px 11px;
+    border-radius:999px;
+    cursor:pointer;
+    user-select:none;
+    color:var(--ink);
+    transition:background .15s, color .15s;
+  }
+  .packing-item input{
+    accent-color:var(--accent);
+    width:14px;
+    height:14px;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .packing-item.checked{
+    background:var(--ok-bg);
+    color:var(--muted);
+    text-decoration:line-through;
+  }
+  .packing-note{
+    font-size:.78rem;
+    color:var(--muted);
+    margin-top:12px;
+  }
+
   footer{
     text-align:center;
     font-size:.75rem;
@@ -1111,6 +1224,15 @@
     </div>
   </div>
 
+  <!-- 준비물 -->
+  <h3 class="section-title">🎒 준비물</h3>
+  <div class="packing-summary">
+    <span>준비 완료 <b id="packingCount">0/0</b></span>
+    <div class="packing-summary-bar"><div class="packing-summary-fill" id="packingFill"></div></div>
+  </div>
+  <div class="packing-grid" id="packing-grid"></div>
+  <p class="packing-note">🍜 컵라면 등은 현지에서 구매</p>
+
   <!-- 추가 후보지 -->
   <h3 class="section-title">📌 추가 방문 후보지</h3>
   <p class="bonus-note">일정에는 아직 배정되지 않았지만 사진이 준비된 후보 스팟입니다.</p>
@@ -1419,6 +1541,101 @@ document.addEventListener("keydown", e=>{
   if(e.key === "ArrowLeft") lbPrev.click();
   if(e.key === "ArrowRight") lbNext.click();
 });
+
+// ══════════════════════════════════════════════
+// 준비물 체크리스트
+// ══════════════════════════════════════════════
+const PACKING_LIST = [
+  { title: "공용", groups: [
+    { items: ["지퍼백","일회용 비닐봉지","일회용 젓가락, 숟가락","과도","캠핑버너","냄비","바르는 모기약"] },
+    { label: "상비약 (멀미약 제외)", items: ["소염진통제","타이레놀","지사제","알러지약","소화제","상처연고","일회용밴드"] },
+  ]},
+  { title: "개인 · 생활용품", groups: [
+    { items: ["신분증","목베개","물티슈","휴지","팬티라이너 및 생리대","양우산"] },
+  ]},
+  { title: "개인 · 전자기기", groups: [
+    { items: ["보조배터리","휴대폰 충전기","개인 카메라 및 충전기 / 필름카메라","고데기","손풍기"] },
+  ]},
+  { title: "개인 · 의류", groups: [
+    { items: ["옷","잠옷","속옷","양말","슬리퍼","선글라스","모자"] },
+  ]},
+  { title: "개인 · 물놀이", groups: [
+    { items: ["수영복","래시가드 및 판초 등 커버업","오리발","스노클 & 마스크","물놀이가방 (매쉬나 방수 등)","아쿠아슈즈"] },
+  ]},
+  { title: "개인 · 상비약", groups: [
+    { items: ["멀미약","피로회복제 및 개인 영양제"] },
+  ]},
+  { title: "개인 · 화장품", groups: [
+    { items: ["기초화장품","색조화장품","알로에젤","워터프루프 선크림&선스틱","마스크팩","스킨패드","핸드크림","헤어에센스","립밤","눈썹칼"] },
+  ]},
+  { title: "개인 · 세면도구", groups: [
+    { items: ["화장솜","클렌징워터/밀크/티슈 (워터프루프라 2차세안 필요할듯)","클렌징폼","샴푸&린스","칫솔&치약","바디워시","샤워타올","수건","면도기"] },
+  ]},
+];
+
+const PACKING_KEY = "ulleungdo_packing_v1";
+let packingChecked = {};
+try{
+  packingChecked = JSON.parse(localStorage.getItem(PACKING_KEY) || "{}");
+}catch(e){ packingChecked = {}; }
+
+const packingGrid = document.getElementById("packing-grid");
+
+function packingItemKey(cat, item){
+  return cat + "::" + item;
+}
+
+function renderPacking(){
+  packingGrid.innerHTML = PACKING_LIST.map(cat=>{
+    const groupsHtml = cat.groups.map(g=>{
+      const itemsHtml = g.items.map(item=>{
+        const key = packingItemKey(cat.title, item);
+        const checked = !!packingChecked[key];
+        return `<label class="packing-item${checked ? " checked" : ""}" data-key="${key}">
+          <input type="checkbox" ${checked ? "checked" : ""}>
+          <span>${item}</span>
+        </label>`;
+      }).join("");
+      return `${g.label ? `<div class="packing-subhead">${g.label}</div>` : ""}<div class="packing-items">${itemsHtml}</div>`;
+    }).join("");
+
+    const total = cat.groups.reduce((s,g)=>s+g.items.length, 0);
+    const done = cat.groups.reduce((s,g)=>s+g.items.filter(item=>packingChecked[packingItemKey(cat.title,item)]).length, 0);
+
+    return `<div class="packing-card">
+      <div class="packing-card-head"><h4>${cat.title}</h4><span class="cnt">${done}/${total}</span></div>
+      <div class="packing-card-body">${groupsHtml}</div>
+    </div>`;
+  }).join("");
+
+  updatePackingSummary();
+}
+
+function updatePackingSummary(){
+  const total = PACKING_LIST.reduce((s,cat)=>s+cat.groups.reduce((s2,g)=>s2+g.items.length,0), 0);
+  const done = Object.values(packingChecked).filter(Boolean).length;
+  document.getElementById("packingCount").textContent = `${done}/${total}`;
+  document.getElementById("packingFill").style.width = (total ? done/total*100 : 0) + "%";
+
+  packingGrid.querySelectorAll(".packing-card").forEach((card, i)=>{
+    const cat = PACKING_LIST[i];
+    const total2 = cat.groups.reduce((s,g)=>s+g.items.length, 0);
+    const done2 = cat.groups.reduce((s,g)=>s+g.items.filter(item=>packingChecked[packingItemKey(cat.title,item)]).length, 0);
+    card.querySelector(".cnt").textContent = `${done2}/${total2}`;
+  });
+}
+
+packingGrid.addEventListener("change", e=>{
+  const label = e.target.closest(".packing-item");
+  if(!label) return;
+  const key = label.dataset.key;
+  packingChecked[key] = e.target.checked;
+  label.classList.toggle("checked", e.target.checked);
+  localStorage.setItem(PACKING_KEY, JSON.stringify(packingChecked));
+  updatePackingSummary();
+});
+
+renderPacking();
 </script>
 
 </body>
