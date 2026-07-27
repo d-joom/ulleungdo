@@ -572,11 +572,12 @@
     border:1px solid var(--line);
     background:#fff;
     color:var(--muted);
-    padding:8px 6px;
+    padding:8px 4px;
     border-radius:10px;
-    font-size:.8rem;
+    font-size:.74rem;
     font-weight:700;
     cursor:pointer;
+    white-space:nowrap;
   }
   .map-day-btn.active{
     background:var(--sea-900);
@@ -823,11 +824,24 @@
     </select>
   </div>
 
+  <!-- 여행 지도 + Day 선택 -->
+  <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">🗺️ Day를 선택하면 지도와 해당 날짜 일정이 함께 표시됩니다.</p>
+  <div class="map-day-tabs" id="map-day-tabs">
+    <button class="map-day-btn" data-day="1">금요일 Day1</button>
+    <button class="map-day-btn" data-day="2">토요일 Day2</button>
+    <button class="map-day-btn" data-day="3">일요일 Day3</button>
+    <button class="map-day-btn" data-day="4">월요일 Day4</button>
+  </div>
+  <div class="map-wrap" id="map-wrap">
+    <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
+  </div>
+  <div class="map-legend" id="map-legend"></div>
+
   <!-- CASE A -->
   <section class="case active" id="case-a">
     <div class="case-summary">✅ <b>금요일 오후, 독도 입성 성공!</b> 이후 일정은 스노클링·관광 위주로 순조롭게 진행됩니다.</div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="1">
       <div class="day-head"><h2>금요일 · Day 1</h2><span class="date">8/21</span></div>
       <div class="day-body">
         <div class="item"><div class="time">11:00</div><div class="content"><div class="title">울릉도 도착</div><div class="desc">🛳️ 묵호 08:20 출발 → 도동 11:00 도착</div></div></div>
@@ -843,7 +857,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="2">
       <div class="day-head"><h2>토요일 · Day 2</h2><span class="date">8/22</span></div>
       <div class="day-body">
         <div class="item"><div class="time">오전</div><div class="content">
@@ -883,7 +897,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="3">
       <div class="day-head"><h2>일요일 · Day 3</h2><span class="date">8/23</span></div>
       <div class="day-body">
         <div class="item"><div class="time">오전</div><div class="content">
@@ -919,7 +933,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="4">
       <div class="day-head"><h2>월요일 · Day 4</h2><span class="date">8/24</span></div>
       <div class="day-body">
         <div class="item"><div class="time"></div><div class="content"><div class="title">서울 복귀</div><div class="desc">🛳️ 도동 12:40 출발 → 묵호 15:20 도착</div></div></div>
@@ -931,7 +945,7 @@
   <section class="case" id="case-b">
     <div class="case-summary">🔁 <b>금요일 실패 → 토요일 오전, 독도 입성 성공!</b> 금요일 오후는 대체 일정(행남해안산책로)으로 진행되고, 토요일부터 원래 계획대로 흘러갑니다.</div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="1">
       <div class="day-head"><h2>금요일 · Day 1</h2><span class="date">8/21</span></div>
       <div class="day-body">
         <div class="item"><div class="time">11:00</div><div class="content"><div class="title">울릉도 도착</div><div class="desc">🛳️ 묵호 08:20 출발 → 도동 11:00 도착</div></div></div>
@@ -952,7 +966,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="2">
       <div class="day-head"><h2>토요일 · Day 2</h2><span class="date">8/22</span></div>
       <div class="day-body">
         <div class="item"><div class="time">오전</div><div class="content">
@@ -974,7 +988,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="3">
       <div class="day-head"><h2>일요일 · Day 3</h2><span class="date">8/23</span></div>
       <div class="day-body">
         <div class="item"><div class="time">오전</div><div class="content">
@@ -1010,7 +1024,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="4">
       <div class="day-head"><h2>월요일 · Day 4</h2><span class="date">8/24</span></div>
       <div class="day-body">
         <div class="item"><div class="time"></div><div class="content"><div class="title">서울 복귀</div><div class="desc">🛳️ 도동 12:40 출발 → 묵호 15:20 도착</div></div></div>
@@ -1022,7 +1036,7 @@
   <section class="case" id="case-c">
     <div class="case-summary">⏳ <b>금·토 연속 실패 → 일요일 오전, 마지막 시도.</b> 이번이 마지막 기회이며, 성공/실패와 무관하게 이후 일정(관음도·동쪽 스노클링)은 동일하게 진행됩니다.</div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="1">
       <div class="day-head"><h2>금요일 · Day 1</h2><span class="date">8/21</span></div>
       <div class="day-body">
         <div class="item"><div class="time">11:00</div><div class="content"><div class="title">울릉도 도착</div><div class="desc">🛳️ 묵호 08:20 출발 → 도동 11:00 도착</div></div></div>
@@ -1043,7 +1057,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="2">
       <div class="day-head"><h2>토요일 · Day 2</h2><span class="date">8/22</span></div>
       <div class="day-body">
         <div class="item"><div class="time">오전</div><div class="content">
@@ -1065,7 +1079,7 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="3">
       <div class="day-head"><h2>일요일 · Day 3</h2><span class="date">8/23</span></div>
       <div class="day-body">
         <div class="item"><div class="time">오전</div><div class="content">
@@ -1101,25 +1115,13 @@
       </div>
     </div>
 
-    <div class="day-card">
+    <div class="day-card" data-day="4">
       <div class="day-head"><h2>월요일 · Day 4</h2><span class="date">8/24</span></div>
       <div class="day-body">
         <div class="item"><div class="time"></div><div class="content"><div class="title">서울 복귀</div><div class="desc">🛳️ 도동 12:40 출발 → 묵호 15:20 도착</div></div></div>
       </div>
     </div>
   </section>
-
-  <!-- 여행 지도 -->
-  <h3 class="section-title">🗺️ 여행 지도</h3>
-  <div class="map-day-tabs" id="map-day-tabs">
-    <button class="map-day-btn" data-day="1">금요일 Day1</button>
-    <button class="map-day-btn" data-day="2">토요일 Day2</button>
-    <button class="map-day-btn" data-day="3">일요일 Day3</button>
-  </div>
-  <div class="map-wrap" id="map-wrap">
-    <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
-  </div>
-  <div class="map-legend" id="map-legend"></div>
   </section>
   <!-- /일정 -->
 
@@ -1329,16 +1331,19 @@ const CASE_ITINERARY = {
     1: ["도동항"],
     2: ["행남해안산책로","거북바위","태하향목모노레일","가재굴","학포항"],
     3: ["내수전일출전망대","관음도","와달리터널","삼선암","선창선착장"],
+    4: [],
   },
   b: {
     1: ["도동항","행남해안산책로"],
     2: ["태하향목모노레일","가재굴","학포항"],
     3: ["내수전일출전망대","관음도","와달리터널","삼선암","선창선착장"],
+    4: [],
   },
   c: {
     1: ["도동항","행남해안산책로"],
     2: ["태하향목모노레일","가재굴","학포항"],
     3: ["내수전일출전망대","관음도","와달리터널","삼선암","선창선착장"],
+    4: [],
   },
 };
 
@@ -1346,6 +1351,7 @@ const DAY_META = {
   1: {label:"금요일 Day1", color:"#f2994a"},
   2: {label:"토요일 Day2", color:"#00c189"},
   3: {label:"일요일 Day3", color:"#2f80ed"},
+  4: {label:"월요일 Day4", color:"#7b5ea7"},
 };
 
 const mapWrap = document.getElementById("map-wrap");
@@ -1360,6 +1366,10 @@ function renderMapPins(){
 
   const names = CASE_ITINERARY[currentCase][currentDay] || [];
   const meta = DAY_META[currentDay];
+
+  if(names.length === 0){
+    mapLegend.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:.8rem">복귀 일정으로 별도 방문 장소가 없습니다.</div>`;
+  }
 
   names.forEach((name, i)=>{
     const pos = MAP_PIN_POS[name];
@@ -1389,6 +1399,14 @@ function setMapDay(day){
     b.classList.toggle("active", Number(b.dataset.day) === day);
   });
   renderMapPins();
+  filterDayCards(day);
+}
+
+// 선택한 Day에 해당하는 일정 카드만 표시 (지도와 함께 해당 날짜 일정만 보이게)
+function filterDayCards(day){
+  document.querySelectorAll(".day-card").forEach(card=>{
+    card.style.display = (Number(card.dataset.day) === day) ? "" : "none";
+  });
 }
 
 mapDayTabs.addEventListener("click", e=>{
