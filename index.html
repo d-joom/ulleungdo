@@ -458,6 +458,20 @@
   .spot-card .thumb{
     height:100px;
     background:#dde7ee;
+    position:relative;
+  }
+  .trip-badge{
+    position:absolute;
+    top:6px;
+    right:6px;
+    background:rgba(0,193,137,.92);
+    color:#fff;
+    font-size:.66rem;
+    font-weight:800;
+    padding:2px 7px;
+    border-radius:999px;
+    box-shadow:0 1px 4px rgba(0,0,0,.25);
+    white-space:nowrap;
   }
   .spot-card .thumb img{
     width:100%;height:100%;object-fit:cover;display:block;
@@ -1456,13 +1470,15 @@ const SPOT_IMAGES = {
 const SNORKEL_SPOTS = [
   {name:"거북바위", highlight:"물 맑음·수심 깊음·넓은 공간·파도 거의 없음·소라 없음", toilet:true, shower:true, rent:true, cook:true},
   {name:"곰바위터널", highlight:"", toilet:true, shower:true, rent:null, cook:null},
-  {name:"학포항", highlight:"스노클링 명소 + 물고기, 그늘 O", toilet:true, shower:true, rent:true, cook:null},
-  {name:"가재굴", highlight:"다이빙 명소, 물고기 많음", toilet:false, shower:false, rent:null, cook:false},
+  {name:"학포항", highlight:"스노클링 명소 + 물고기, 그늘 O", toilet:true, shower:true, rent:true, cook:null, inTrip:true},
+  {name:"가재굴", highlight:"다이빙 명소, 물고기 많음", toilet:false, shower:false, rent:null, cook:false, inTrip:true},
+  {name:"와달리터널", highlight:"정들포 전망대 아래 해변 · 오전 방문 추천(바다색 예쁨)", toilet:null, shower:null, rent:null, cook:null, inTrip:true},
+  {name:"삼선암", highlight:"물고기 많음 · 내려가는 길 험함 · ⚠️ 바다 상황에 따라 입수 제한될 수 있음", toilet:false, shower:false, rent:null, cook:null, inTrip:true},
   {name:"울릉독도해양연구기지", highlight:"뿔소라 스팟 (큰 뿔소라 많음) · 방파제 안쪽이라 파도 없고 수심 안정적", toilet:true, shower:true, rent:false, cook:true},
   {name:"현포항", highlight:"", toilet:true, shower:false, rent:null, cook:null},
   {name:"천부항", highlight:"방파제로 파도 세지 않음·물살 잔잔·수심 얕음, 해수풀장, 공영주차장 무료", toilet:true, shower:true, rent:true, cook:null},
   {name:"죽암몽돌해변", highlight:"그늘 O", toilet:true, shower:false, rent:null, cook:null},
-  {name:"선창선착장", highlight:"스노클링 & 뿔소라 스팟", toilet:true, shower:false, rent:null, cook:null},
+  {name:"선창선착장", highlight:"스노클링 & 뿔소라 스팟", toilet:true, shower:false, rent:null, cook:null, inTrip:true},
   {name:"내수전몽돌해변", highlight:"아쿠아슈즈 필수", toilet:true, shower:true, rent:true, cook:null},
   {name:"사동해수욕장", highlight:"", toilet:true, shower:true, rent:true, cook:null},
 ];
@@ -1551,7 +1567,7 @@ SNORKEL_SPOTS.forEach(spot=>{
   card.className = "spot-card";
   const imgs = SPOT_IMAGES[spot.name];
   card.innerHTML = `
-    <div class="thumb">${imgs ? `<img src="img/${imgs[0]}" loading="lazy" alt="">` : ""}</div>
+    <div class="thumb">${imgs ? `<img src="img/${imgs[0]}" loading="lazy" alt="">` : ""}${spot.inTrip ? `<span class="trip-badge">⭐ 일정 포함</span>` : ""}</div>
     <div class="info">
       <div class="name">${spot.name}</div>
       <div class="highlight">${spot.highlight || ""}</div>
