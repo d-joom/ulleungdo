@@ -514,7 +514,11 @@
   }
 
   .map-row{
-    display:block;
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:flex-start;
+    justify-content:center;
   }
   .map-wrap{
     position:relative;
@@ -523,7 +527,8 @@
     border:1px solid var(--line);
     background:#dfe9ee;
     width:min(340px, 100%);
-    margin:0 auto;
+    margin:0;
+    flex:0 0 auto;
   }
   .map-wrap img{
     display:block;
@@ -591,10 +596,11 @@
   }
 
   .map-legend{
-    margin-top:12px;
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(110px,1fr));
-    gap:6px 14px;
+    margin-top:0;
+    flex:1 1 140px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
     font-size:.8rem;
     color:var(--ink);
   }
@@ -1374,7 +1380,7 @@ function renderMapPins(){
   const meta = DAY_META[currentDay];
 
   if(names.length === 0){
-    mapLegend.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:.8rem">복귀 일정으로 별도 방문 장소가 없습니다.</div>`;
+    mapLegend.innerHTML = `<div style="color:var(--muted);font-size:.8rem">복귀 일정으로 별도 방문 장소가 없습니다.</div>`;
   }
 
   names.forEach((name, i)=>{
