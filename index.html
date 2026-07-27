@@ -619,6 +619,22 @@
     margin-top:8px;
   }
 
+  .seat-chip{
+    display:inline-block;
+    background:var(--sea-100);
+    color:var(--sea-700);
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:8px;
+    margin:2px 3px 2px 0;
+    font-size:.76rem;
+    white-space:nowrap;
+  }
+  table.ferry td.seats{
+    white-space:normal;
+    line-height:1.9;
+  }
+
   footer{
     text-align:center;
     font-size:.75rem;
@@ -637,6 +653,7 @@
     <span>🤿 목표2 · 스노클링</span>
   </div>
   <div class="dates">
+    <span>8/20(목) 서울 출발(기차)</span>
     <span>8/21(금) 울릉도 도착</span>
     <span>8/22(토)</span>
     <span>8/23(일)</span>
@@ -949,6 +966,47 @@
     <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
   </div>
   <div class="map-legend" id="map-legend"></div>
+
+  <!-- 서울-묵호 기차 예매 정보 -->
+  <h3 class="section-title">🚄 서울 ↔ 묵호 기차 (예매 완료)</h3>
+  <div class="ferry-scroll">
+    <table class="ferry">
+      <thead>
+        <tr>
+          <th>구간</th>
+          <th>출발</th>
+          <th>도착</th>
+          <th>호차</th>
+          <th>좌석</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="route">서울 → 묵호</td>
+          <td>19:50</td>
+          <td>22:18</td>
+          <td>2호차</td>
+          <td class="seats">
+            <span class="seat-chip">호정 9A</span>
+            <span class="seat-chip">보미 9B</span>
+            <span class="seat-chip">주민 8A</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="route">묵호 → 서울</td>
+          <td>19:11</td>
+          <td>21:49</td>
+          <td>2호차</td>
+          <td class="seats">
+            <span class="seat-chip">호정 13B</span>
+            <span class="seat-chip">보미 13A</span>
+            <span class="seat-chip">주민 14A</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="ferry-note">🎫 최최종 확정! 왕복 자리 땅땅 예매 완료</p>
 
   <!-- 묵호-울릉도 배편 정보 -->
   <h3 class="section-title">🛳️ 묵호 ↔ 울릉도(도동) 배편</h3>
