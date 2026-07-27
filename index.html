@@ -513,13 +513,20 @@
     margin-bottom:10px;
   }
 
+  .map-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:flex-start;
+    justify-content:center;
+  }
   .map-wrap{
     position:relative;
     border-radius:12px;
     overflow:hidden;
     border:1px solid var(--line);
     background:#dfe9ee;
-    max-width:340px;
+    width:min(340px, 100%);
     margin:0 auto;
   }
   .map-wrap img{
@@ -588,15 +595,14 @@
   }
 
   .map-legend{
-    margin-top:10px;
+    margin-top:0;
+    flex:1 1 160px;
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(auto-fill, minmax(110px,1fr));
+    align-content:start;
     gap:6px 14px;
     font-size:.8rem;
     color:var(--ink);
-  }
-  @media(min-width:560px){
-    .map-legend{grid-template-columns:1fr 1fr 1fr;}
   }
   .map-legend-item{
     display:flex;
@@ -834,10 +840,12 @@
     <button class="map-day-btn" data-day="3">일요일 Day3</button>
     <button class="map-day-btn" data-day="4">월요일 Day4</button>
   </div>
-  <div class="map-wrap" id="map-wrap">
-    <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
+  <div class="map-row">
+    <div class="map-wrap" id="map-wrap">
+      <img id="map-img" src="img/울릉도관광지도.jpg" alt="울릉도 관광지도" loading="lazy">
+    </div>
+    <div class="map-legend" id="map-legend"></div>
   </div>
-  <div class="map-legend" id="map-legend"></div>
 
   <!-- CASE A -->
   <section class="case active" id="case-a">
