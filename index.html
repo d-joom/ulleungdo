@@ -1457,6 +1457,9 @@ const mapDayTabs = document.getElementById("map-day-tabs");
 let currentCase = "a";
 let currentDay = 1;
 
+// 지도 범례에 🤿 표시할 스노클링 스팟 (거북바위는 이번 일정에서 구경만이라 제외)
+const SNORKEL_ITINERARY_SPOTS = new Set(["가재굴","학포항","와달리터널","삼선암","선창선착장"]);
+
 function renderMapPins(){
   mapWrap.querySelectorAll(".map-pin").forEach(el=>el.remove());
   mapLegend.innerHTML = "";
@@ -1484,9 +1487,10 @@ function renderMapPins(){
     el.title = name;
     mapWrap.appendChild(el);
 
+    const legendLabel = SNORKEL_ITINERARY_SPOTS.has(baseName) ? `🤿 ${name}` : name;
     const legendItem = document.createElement("div");
     legendItem.className = "map-legend-item";
-    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${name}`;
+    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${legendLabel}`;
     mapLegend.appendChild(legendItem);
   });
 }
