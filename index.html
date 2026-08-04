@@ -2066,11 +2066,17 @@ const RESERVATION_ITEMS = [
 ];
 
 const EXPENSE_KEY = "ulleungdo_expense_v1";
+// 이미 알려진 예약 금액 기본값 (처음 열 때만 채워지고, 직접 수정하면 그 값이 우선됨)
+const DEFAULT_RESERVATIONS = {
+  train: 92100,  // 서울→묵호 기차 30,700원 x 3인
+  bus: 85900,    // 동해→서울경부 고속버스: 호정 19,300원 + 보미·주민 33,300원 x 2
+};
 let expenseData = { reservations: {}, shared: [] };
 try{
   const saved = JSON.parse(localStorage.getItem(EXPENSE_KEY) || "null");
   if(saved) expenseData = saved;
 }catch(e){}
+expenseData.reservations = { ...DEFAULT_RESERVATIONS, ...expenseData.reservations };
 
 function saveExpense(){
   localStorage.setItem(EXPENSE_KEY, JSON.stringify(expenseData));
