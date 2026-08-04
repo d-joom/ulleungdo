@@ -844,6 +844,60 @@
     color:var(--sea-900);
     font-feature-settings:'tnum';
   }
+  .expense-detail-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    background:none;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:.8rem;
+    color:var(--sea-700);
+    cursor:pointer;
+    margin-bottom:14px;
+  }
+  .expense-detail-toggle:hover{background:var(--sea-100);}
+  .expense-detail{
+    display:none;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .expense-person-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .expense-person-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    background:var(--sea-100);
+    font-size:.85rem;
+  }
+  .expense-person-head b{
+    font-family:'GmarketSans','Pretendard',sans-serif;
+  }
+  .expense-person-head span{
+    font-feature-settings:'tnum';
+    font-weight:700;
+    color:var(--sea-900);
+  }
+  .expense-person-body{
+    padding:8px 14px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .expense-detail-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:.78rem;
+    color:var(--muted);
+  }
   .expense-card{
     background:var(--card);
     border:1px solid var(--line);
@@ -891,6 +945,33 @@
     border:1px solid var(--line);
     border-radius:8px;
     font-size:.85rem;
+    text-align:right;
+    font-feature-settings:'tnum';
+  }
+  .expense-row.perperson{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+  }
+  .expense-person-inputs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    width:100%;
+  }
+  .expense-person-input{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:.78rem;
+    color:var(--muted);
+  }
+  .expense-person-input input{
+    width:90px;
+    padding:6px 8px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:.82rem;
     text-align:right;
     font-feature-settings:'tnum';
   }
@@ -1569,6 +1650,9 @@
     </div>
   </div>
 
+  <button type="button" class="expense-detail-toggle" id="expenseDetailToggle">개인별 상세보기 ▾</button>
+  <div class="expense-detail" id="expense-detail"></div>
+
   <div class="expense-card">
     <div class="expense-card-head"><h4>📌 예약 경비</h4><span class="cnt" id="reservationTotalTag">0원</span></div>
     <div class="expense-card-body" id="reservation-list"></div>
@@ -2057,26 +2141,34 @@ renderPacking();
 const PARTICIPANTS = ["호정","보미","주민"];
 
 const RESERVATION_ITEMS = [
-  { key: "train", label: "🚄 기차 (서울→묵호)" },
-  { key: "bus", label: "🚌 고속버스 (동해→서울경부)" },
-  { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)" },
-  { key: "lodging", label: "🏠 숙소" },
-  { key: "boat_dokdo", label: "🏝️ 독도 입도 유람선" },
-  { key: "snorkel_gear", label: "🤿 스노클링 장비 대여" },
+  { key: "train", label: "🚄 기차 (서울→묵호)", splitType: "equal" },
+  { key: "bus", label: "🚌 고속버스 (동해→서울경부)", splitType: "perPerson" },
+  { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)", splitType: "equal" },
+  { key: "lodging", label: "🏠 숙소", splitType: "equal" },
+  { key: "boat_dokdo", label: "🏝️ 독도 입도 유람선", splitType: "equal" },
+  { key: "snorkel_gear", label: "🤿 스노클링 장비 대여", splitType: "equal" },
 ];
 
 const EXPENSE_KEY = "ulleungdo_expense_v1";
 // 이미 알려진 예약 금액 기본값 (처음 열 때만 채워지고, 직접 수정하면 그 값이 우선됨)
 const DEFAULT_RESERVATIONS = {
   train: 92100,  // 서울→묵호 기차 30,700원 x 3인
-  bus: 85900,    // 동해→서울경부 고속버스: 호정 19,300원 + 보미·주민 33,300원 x 2
+  bus: { "호정": 19300, "보미": 33300, "주민": 33300 },  // 동해→서울경부 고속버스, 인원별 요금 다름
 };
 let expenseData = { reservations: {}, shared: [] };
 try{
   const saved = JSON.parse(localStorage.getItem(EXPENSE_KEY) || "null");
   if(saved) expenseData = saved;
 }catch(e){}
-expenseData.reservations = { ...DEFAULT_RESERVATIONS, ...expenseData.reservations };
+if(!expenseData.reservations) expenseData.reservations = {};
+RESERVATION_ITEMS.forEach(item=>{
+  const existing = expenseData.reservations[item.key];
+  const isPerPerson = item.splitType === "perPerson";
+  const validExisting = isPerPerson ? (existing && typeof existing === "object") : (typeof existing === "number");
+  if(!validExisting && DEFAULT_RESERVATIONS[item.key] !== undefined){
+    expenseData.reservations[item.key] = isPerPerson ? { ...DEFAULT_RESERVATIONS[item.key] } : DEFAULT_RESERVATIONS[item.key];
+  }
+});
 
 function saveExpense(){
   localStorage.setItem(EXPENSE_KEY, JSON.stringify(expenseData));
@@ -2086,9 +2178,39 @@ function formatWon(n){
   return (n || 0).toLocaleString("ko-KR") + "원";
 }
 
+function reservationItemTotal(item){
+  const val = expenseData.reservations[item.key];
+  if(item.splitType === "perPerson"){
+    if(!val) return 0;
+    return Object.values(val).reduce((s,v)=>s+(Number(v)||0), 0);
+  }
+  return Number(val) || 0;
+}
+
+function personReservationShare(item, person){
+  const val = expenseData.reservations[item.key];
+  if(item.splitType === "perPerson"){
+    return (val && Number(val[person])) || 0;
+  }
+  return Math.round((Number(val) || 0) / PARTICIPANTS.length);
+}
+
 function renderReservationList(){
   const el = document.getElementById("reservation-list");
   el.innerHTML = RESERVATION_ITEMS.map(item=>{
+    if(item.splitType === "perPerson"){
+      const val = expenseData.reservations[item.key] || {};
+      const inputsHtml = PARTICIPANTS.map(p=>`
+        <span class="expense-person-input">
+          <span class="who">${p}</span>
+          <input type="number" min="0" step="100" data-key="${item.key}" data-person="${p}" value="${val[p] || ""}" placeholder="0">
+        </span>
+      `).join("");
+      return `<div class="expense-row perperson">
+        <span class="label">${item.label}</span>
+        <div class="expense-person-inputs">${inputsHtml}</div>
+      </div>`;
+    }
     const val = expenseData.reservations[item.key] || 0;
     return `<div class="expense-row">
       <span class="label">${item.label}</span>
@@ -2117,8 +2239,44 @@ function renderSharedList(){
   `).join("");
 }
 
+function computePersonBreakdown(person){
+  const rows = [];
+  let total = 0;
+
+  RESERVATION_ITEMS.forEach(item=>{
+    const amount = personReservationShare(item, person);
+    if(amount > 0){
+      rows.push({ label: item.label, amount });
+      total += amount;
+    }
+  });
+
+  const sharedTotal = expenseData.shared.reduce((s,e)=>s+(Number(e.amount)||0), 0);
+  const sharedShare = Math.round(sharedTotal / PARTICIPANTS.length);
+  if(sharedShare > 0){
+    rows.push({ label: "🧾 공용경비 분담", amount: sharedShare });
+    total += sharedShare;
+  }
+
+  return { rows, total };
+}
+
+function renderExpenseDetail(){
+  const el = document.getElementById("expense-detail");
+  el.innerHTML = PARTICIPANTS.map(person=>{
+    const { rows, total } = computePersonBreakdown(person);
+    const rowsHtml = rows.length
+      ? rows.map(r=>`<div class="expense-detail-row"><span>${r.label}</span><span>${formatWon(r.amount)}</span></div>`).join("")
+      : `<div class="expense-detail-row">아직 입력된 경비가 없습니다.</div>`;
+    return `<div class="expense-person-card">
+      <div class="expense-person-head"><b>${person}</b><span>${formatWon(total)}</span></div>
+      <div class="expense-person-body">${rowsHtml}</div>
+    </div>`;
+  }).join("");
+}
+
 function updateExpenseSummary(){
-  const reservationTotal = Object.values(expenseData.reservations).reduce((s,v)=>s+(Number(v)||0), 0);
+  const reservationTotal = RESERVATION_ITEMS.reduce((s,item)=>s+reservationItemTotal(item), 0);
   const sharedTotal = expenseData.shared.reduce((s,e)=>s+(Number(e.amount)||0), 0);
   const grandTotal = reservationTotal + sharedTotal;
   const perPerson = Math.round(grandTotal / PARTICIPANTS.length);
@@ -2127,6 +2285,8 @@ function updateExpenseSummary(){
   document.getElementById("expensePerPerson").textContent = formatWon(perPerson);
   document.getElementById("reservationTotalTag").textContent = formatWon(reservationTotal);
   document.getElementById("sharedTotalTag").textContent = formatWon(sharedTotal);
+
+  renderExpenseDetail();
 }
 
 function renderExpense(){
@@ -2139,9 +2299,29 @@ function renderExpense(){
 document.getElementById("reservation-list").addEventListener("input", e=>{
   const input = e.target.closest("input[data-key]");
   if(!input) return;
-  expenseData.reservations[input.dataset.key] = Number(input.value) || 0;
+  const key = input.dataset.key;
+  const item = RESERVATION_ITEMS.find(it=>it.key === key);
+
+  if(item && item.splitType === "perPerson"){
+    const person = input.dataset.person;
+    if(!expenseData.reservations[key] || typeof expenseData.reservations[key] !== "object"){
+      expenseData.reservations[key] = {};
+    }
+    expenseData.reservations[key][person] = Number(input.value) || 0;
+  } else {
+    expenseData.reservations[key] = Number(input.value) || 0;
+  }
+
   saveExpense();
   updateExpenseSummary();
+});
+
+document.getElementById("expenseDetailToggle").addEventListener("click", ()=>{
+  const el = document.getElementById("expense-detail");
+  const btn = document.getElementById("expenseDetailToggle");
+  const show = el.style.display !== "grid";
+  el.style.display = show ? "grid" : "none";
+  btn.textContent = show ? "개인별 상세 닫기 ▴" : "개인별 상세보기 ▾";
 });
 
 document.getElementById("shared-list").addEventListener("click", e=>{
