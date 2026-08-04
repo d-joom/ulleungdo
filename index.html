@@ -2148,6 +2148,7 @@ const DEFAULT_RESERVATIONS = {
 // 처음 열 때만 채워지는 공용경비 기본 항목 (주유비는 현장 결제라 예약경비가 아닌 공용경비로 관리)
 const DEFAULT_SHARED = [
   { id: "fuel_default", desc: "주유비 (예상, 현장결제)", amount: 30000, payer: "" },
+  { id: "jjimjilbang_default", desc: "묵호 금강산 건강랜드 찜질방 (인당 17,000원, 현장결제)", amount: 51000, payer: "" },
 ];
 let expenseData = { reservations: {}, shared: [...DEFAULT_SHARED] };
 try{
