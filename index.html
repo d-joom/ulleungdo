@@ -656,6 +656,7 @@
   }
   .map-legend-item.no-pin{color:var(--muted);}
   .map-legend-item .pin-pending{font-size:.7rem;color:var(--muted);}
+  .map-legend-item .pin-note{font-size:.7rem;color:var(--sea-500);}
 
   .ferry-scroll{
     overflow-x:auto;
@@ -1838,6 +1839,11 @@ const SPOT_LINKS = {
   "울릉독도해양연구기지": "https://blog.naver.com/dhdjdkdl123/224013744578",
 };
 
+const SPOT_NOTES = {
+  "울릉독도해양연구기지": "취사가능",
+  "선창선착장": "취사가능",
+};
+
 function renderMapPins(){
   mapWrap.querySelectorAll(".map-pin").forEach(el=>el.remove());
   mapLegend.innerHTML = "";
@@ -1867,11 +1873,13 @@ function renderMapPins(){
     }
 
     const legendLabel = SNORKEL_ITINERARY_SPOTS.has(baseName) ? `🤿 ${name}` : name;
+    const note = SPOT_NOTES[baseName];
+    const noteHtml = note ? ` <span class="pin-note">(${note})</span>` : "";
     const link = SPOT_LINKS[baseName];
     const linkHtml = link ? ` <a class="inline-link" href="${link}" target="_blank" rel="noopener">🔗</a>` : "";
     const legendItem = document.createElement("div");
     legendItem.className = "map-legend-item" + (pos ? "" : " no-pin");
-    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${legendLabel}${pos ? "" : ` <span class="pin-pending">(위치 미정)</span>`}${linkHtml}`;
+    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${legendLabel}${noteHtml}${pos ? "" : ` <span class="pin-pending">(위치 미정)</span>`}${linkHtml}`;
     mapLegend.appendChild(legendItem);
   });
 }
