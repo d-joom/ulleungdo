@@ -2123,9 +2123,10 @@ const PARTICIPANTS = ["호정","보미","주민"];
 const RESERVATION_ITEMS = [
   { key: "train", label: "🚄 기차 (서울→묵호)", splitType: "equal" },
   { key: "bus", label: "🚌 고속버스 (동해→서울경부)", splitType: "perPerson" },
+  { key: "fuel", label: "⛽ 주유비 (예상)", splitType: "equal" },
   { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)", splitType: "equal" },
   { key: "lodging", label: "🏠 숙소", splitType: "equal" },
-  { key: "boat_dokdo", label: "🏝️ 독도 입도 유람선", splitType: "equal" },
+  { key: "boat_dokdo", label: "🏝️ 독도 유람선 (저동→독도, 금 14:25)", splitType: "equal" },
   { key: "snorkel_gear", label: "🤿 스노클링 장비 대여", splitType: "equal" },
 ];
 
@@ -2134,6 +2135,9 @@ const EXPENSE_KEY = "ulleungdo_expense_v1";
 const DEFAULT_RESERVATIONS = {
   train: 92100,  // 서울→묵호 기차 30,700원 x 3인
   bus: { "호정": 19300, "보미": 33300, "주민": 33300 },  // 동해→서울경부 고속버스, 인원별 요금 다름
+  fuel: 30000,  // 예상 주유비
+  ferry: 393000,  // 묵호↔울릉도 편도 65,500원 x 왕복2 x 3인
+  boat_dokdo: 180000,  // 독도 유람선 1층 인당 60,000원 x 3인
 };
 let expenseData = { reservations: {}, shared: [] };
 try{
