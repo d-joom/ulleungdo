@@ -870,16 +870,6 @@
     border-radius:var(--radius);
     overflow:hidden;
   }
-  .expense-person-card.total{
-    background:var(--sea-900);
-  }
-  .expense-person-card.total .expense-person-head{
-    background:var(--sea-900);
-  }
-  .expense-person-card.total .expense-person-head b,
-  .expense-person-card.total .expense-person-head span{
-    color:#fff;
-  }
   .expense-person-head{
     display:flex;
     align-items:center;
@@ -2125,9 +2115,8 @@ const RESERVATION_ITEMS = [
   { key: "bus", label: "🚌 고속버스 (동해→서울경부)", splitType: "perPerson" },
   { key: "fuel", label: "⛽ 주유비 (예상)", splitType: "equal" },
   { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)", splitType: "equal" },
-  { key: "lodging", label: "🏠 숙소", splitType: "equal" },
+  { key: "lodging", label: "🏠 숙소 (호텔 섬앤썸)", splitType: "equal" },
   { key: "boat_dokdo", label: "🏝️ 독도 유람선 (저동→독도, 금 14:25)", splitType: "equal" },
-  { key: "snorkel_gear", label: "🤿 스노클링 장비 대여", splitType: "equal" },
 ];
 
 const EXPENSE_KEY = "ulleungdo_expense_v1";
@@ -2137,6 +2126,7 @@ const DEFAULT_RESERVATIONS = {
   bus: { "호정": 19300, "보미": 33300, "주민": 33300 },  // 동해→서울경부 고속버스, 인원별 요금 다름
   fuel: 30000,  // 예상 주유비
   ferry: 393000,  // 묵호↔울릉도 편도 65,500원 x 왕복2 x 3인
+  lodging: 260000,  // 호텔 섬앤썸
   boat_dokdo: 180000,  // 독도 유람선 1층 인당 60,000원 x 3인
 };
 let expenseData = { reservations: {}, shared: [] };
@@ -2248,11 +2238,9 @@ function computePersonBreakdown(person){
 
 function renderExpenseDetail(){
   const el = document.getElementById("expense-detail");
-  let grandTotal = 0;
 
-  const cardsHtml = PARTICIPANTS.map(person=>{
+  el.innerHTML = PARTICIPANTS.map(person=>{
     const { rows, total } = computePersonBreakdown(person);
-    grandTotal += total;
     const rowsHtml = rows.length
       ? rows.map(r=>`<div class="expense-detail-row"><span>${r.label}</span><span>${formatWon(r.amount)}</span></div>`).join("")
       : `<div class="expense-detail-row">아직 입력된 경비가 없습니다.</div>`;
@@ -2261,12 +2249,6 @@ function renderExpenseDetail(){
       <div class="expense-person-body">${rowsHtml}</div>
     </div>`;
   }).join("");
-
-  const totalHtml = `<div class="expense-person-card total">
-    <div class="expense-person-head"><b>합계</b><span>${formatWon(grandTotal)}</span></div>
-  </div>`;
-
-  el.innerHTML = cardsHtml + totalHtml;
 }
 
 function updateExpenseSummary(){
