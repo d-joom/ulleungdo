@@ -818,6 +818,151 @@
     margin-top:12px;
   }
 
+  /* 경비 */
+  .expense-summary{
+    display:flex;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .expense-summary-item{
+    flex:1;
+    background:var(--sea-100);
+    border:1px solid #cfe6f3;
+    border-radius:var(--radius);
+    padding:12px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .expense-summary-item span{
+    font-size:.78rem;
+    color:var(--sea-700);
+  }
+  .expense-summary-item b{
+    font-family:'GmarketSans','Pretendard',sans-serif;
+    font-size:1.15rem;
+    color:var(--sea-900);
+    font-feature-settings:'tnum';
+  }
+  .expense-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(10,37,64,.06);
+    margin-bottom:14px;
+  }
+  .expense-card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    background:var(--sea-900);
+    color:#fff;
+  }
+  .expense-card-head h4{
+    margin:0;
+    font-family:'GmarketSans','Pretendard',sans-serif;
+    font-weight:500;
+    font-size:.92rem;
+  }
+  .expense-card-head .cnt{
+    font-size:.78rem;
+    font-weight:700;
+    opacity:.9;
+    font-feature-settings:'tnum';
+  }
+  .expense-card-body{
+    padding:12px 14px 14px;
+  }
+  .expense-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+    font-size:.85rem;
+  }
+  .expense-row:last-child{border-bottom:none;}
+  .expense-row input[type="number"]{
+    width:110px;
+    padding:6px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:.85rem;
+    text-align:right;
+    font-feature-settings:'tnum';
+  }
+  .expense-shared-list{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:10px;
+  }
+  .expense-shared-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+    font-size:.85rem;
+  }
+  .expense-shared-item .meta{
+    display:flex;
+    flex-direction:column;
+  }
+  .expense-shared-item .desc{color:var(--ink);}
+  .expense-shared-item .payer{font-size:.72rem;color:var(--muted);}
+  .expense-shared-item .amt{
+    font-feature-settings:'tnum';
+    font-weight:700;
+    color:var(--sea-900);
+  }
+  .expense-remove-btn{
+    background:none;
+    border:none;
+    color:var(--muted);
+    cursor:pointer;
+    font-size:.9rem;
+    padding:2px 6px;
+  }
+  .expense-remove-btn:hover{color:#e0554f;}
+  .expense-add-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .expense-add-row input[type="text"]{
+    flex:2;
+    min-width:120px;
+  }
+  .expense-add-row input[type="number"]{
+    flex:1;
+    min-width:90px;
+  }
+  .expense-add-row select{
+    flex:1;
+    min-width:90px;
+  }
+  .expense-add-row input, .expense-add-row select{
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:.82rem;
+    font-family:inherit;
+  }
+  .expense-add-row button{
+    padding:8px 16px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:#fff;
+    font-size:.82rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+
   footer{
     text-align:center;
     font-size:.75rem;
@@ -849,6 +994,7 @@
   <button class="main-tab-btn" data-tab="transport">🚄 교통</button>
   <button class="main-tab-btn" data-tab="snorkel">🤿 스노클링</button>
   <button class="main-tab-btn" data-tab="food">🍽️ 맛집</button>
+  <button class="main-tab-btn" data-tab="expense">💰 경비</button>
   <button class="main-tab-btn" data-tab="packing">🎒 준비물</button>
 </nav>
 
@@ -1380,6 +1526,42 @@
   <!-- /맛집 -->
 
   <!-- 준비물 -->
+  <section class="main-panel" id="panel-expense">
+  <h3 class="section-title" style="margin-top:0">💰 경비</h3>
+
+  <div class="expense-summary">
+    <div class="expense-summary-item">
+      <span>총 경비</span>
+      <b id="expenseTotal">0원</b>
+    </div>
+    <div class="expense-summary-item">
+      <span id="expensePerPersonLabel">1인당 분담액</span>
+      <b id="expensePerPerson">0원</b>
+    </div>
+  </div>
+
+  <div class="expense-card">
+    <div class="expense-card-head"><h4>📌 예약 경비</h4><span class="cnt" id="reservationTotalTag">0원</span></div>
+    <div class="expense-card-body" id="reservation-list"></div>
+  </div>
+
+  <div class="expense-card">
+    <div class="expense-card-head"><h4>🧾 공용경비</h4><span class="cnt" id="sharedTotalTag">0원</span></div>
+    <div class="expense-card-body">
+      <div class="expense-shared-list" id="shared-list"></div>
+      <div class="expense-add-row">
+        <input type="text" id="sharedDescInput" placeholder="항목 (예: 마트 장보기)">
+        <input type="number" id="sharedAmountInput" placeholder="금액" min="0" step="1000">
+        <select id="sharedPayerInput"></select>
+        <button type="button" id="sharedAddBtn">추가</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="packing-note">💾 입력한 금액은 이 브라우저에 자동 저장됩니다.</p>
+  </section>
+  <!-- /경비 -->
+
   <section class="main-panel" id="panel-packing">
   <h3 class="section-title" style="margin-top:0">🎒 준비물</h3>
   <div class="packing-summary">
@@ -1839,6 +2021,123 @@ packingGrid.addEventListener("change", e=>{
 });
 
 renderPacking();
+
+// ---------------------------------------------------------
+// 경비
+// ---------------------------------------------------------
+const PARTICIPANTS = ["호정","보미","주민"];
+
+const RESERVATION_ITEMS = [
+  { key: "train", label: "🚄 기차 (서울↔묵호 왕복)" },
+  { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)" },
+  { key: "lodging", label: "🏠 숙소" },
+  { key: "boat_dokdo", label: "🏝️ 독도 입도 유람선" },
+  { key: "snorkel_gear", label: "🤿 스노클링 장비 대여" },
+];
+
+const EXPENSE_KEY = "ulleungdo_expense_v1";
+let expenseData = { reservations: {}, shared: [] };
+try{
+  const saved = JSON.parse(localStorage.getItem(EXPENSE_KEY) || "null");
+  if(saved) expenseData = saved;
+}catch(e){}
+
+function saveExpense(){
+  localStorage.setItem(EXPENSE_KEY, JSON.stringify(expenseData));
+}
+
+function formatWon(n){
+  return (n || 0).toLocaleString("ko-KR") + "원";
+}
+
+function renderReservationList(){
+  const el = document.getElementById("reservation-list");
+  el.innerHTML = RESERVATION_ITEMS.map(item=>{
+    const val = expenseData.reservations[item.key] || 0;
+    return `<div class="expense-row">
+      <span class="label">${item.label}</span>
+      <input type="number" min="0" step="1000" data-key="${item.key}" value="${val || ""}" placeholder="0">
+    </div>`;
+  }).join("");
+}
+
+function renderSharedList(){
+  const el = document.getElementById("shared-list");
+  if(expenseData.shared.length === 0){
+    el.innerHTML = `<div style="color:var(--muted);font-size:.8rem;padding:6px 0">아직 등록된 공용경비가 없습니다.</div>`;
+    return;
+  }
+  el.innerHTML = expenseData.shared.map(entry=>`
+    <div class="expense-shared-item" data-id="${entry.id}">
+      <div class="meta">
+        <span class="desc">${entry.desc}</span>
+        <span class="payer">${entry.payer ? entry.payer + " 결제" : "결제자 미지정"}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="amt">${formatWon(entry.amount)}</span>
+        <button type="button" class="expense-remove-btn" data-id="${entry.id}">✕</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function updateExpenseSummary(){
+  const reservationTotal = Object.values(expenseData.reservations).reduce((s,v)=>s+(Number(v)||0), 0);
+  const sharedTotal = expenseData.shared.reduce((s,e)=>s+(Number(e.amount)||0), 0);
+  const grandTotal = reservationTotal + sharedTotal;
+  const perPerson = Math.round(grandTotal / PARTICIPANTS.length);
+
+  document.getElementById("expenseTotal").textContent = formatWon(grandTotal);
+  document.getElementById("expensePerPerson").textContent = formatWon(perPerson);
+  document.getElementById("reservationTotalTag").textContent = formatWon(reservationTotal);
+  document.getElementById("sharedTotalTag").textContent = formatWon(sharedTotal);
+}
+
+function renderExpense(){
+  document.getElementById("expensePerPersonLabel").textContent = `1인당 분담액 (${PARTICIPANTS.join("·")})`;
+  renderReservationList();
+  renderSharedList();
+  updateExpenseSummary();
+}
+
+document.getElementById("reservation-list").addEventListener("input", e=>{
+  const input = e.target.closest("input[data-key]");
+  if(!input) return;
+  expenseData.reservations[input.dataset.key] = Number(input.value) || 0;
+  saveExpense();
+  updateExpenseSummary();
+});
+
+document.getElementById("shared-list").addEventListener("click", e=>{
+  const btn = e.target.closest(".expense-remove-btn");
+  if(!btn) return;
+  expenseData.shared = expenseData.shared.filter(en=>String(en.id) !== btn.dataset.id);
+  saveExpense();
+  renderSharedList();
+  updateExpenseSummary();
+});
+
+const sharedPayerSelect = document.getElementById("sharedPayerInput");
+sharedPayerSelect.innerHTML = `<option value="">결제자</option>` + PARTICIPANTS.map(p=>`<option value="${p}">${p}</option>`).join("");
+
+document.getElementById("sharedAddBtn").addEventListener("click", ()=>{
+  const descInput = document.getElementById("sharedDescInput");
+  const amountInput = document.getElementById("sharedAmountInput");
+  const desc = descInput.value.trim();
+  const amount = Number(amountInput.value) || 0;
+  const payer = sharedPayerSelect.value;
+  if(!desc || amount <= 0) return;
+
+  expenseData.shared.push({ id: Date.now(), desc, amount, payer });
+  saveExpense();
+  descInput.value = "";
+  amountInput.value = "";
+  sharedPayerSelect.value = "";
+  renderSharedList();
+  updateExpenseSummary();
+});
+
+renderExpense();
 </script>
 
 </body>
