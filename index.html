@@ -1871,7 +1871,7 @@ function renderMapPins(){
     const linkHtml = link ? ` <a class="inline-link" href="${link}" target="_blank" rel="noopener">🔗</a>` : "";
     const legendItem = document.createElement("div");
     legendItem.className = "map-legend-item" + (pos ? "" : " no-pin");
-    legendItem.innerHTML = `<span class="num" style="background:${pos ? meta.color : "#b8c2cc"}">${num}</span>${legendLabel}${pos ? "" : ` <span class="pin-pending">(위치 미정)</span>`}${linkHtml}`;
+    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${legendLabel}${pos ? "" : ` <span class="pin-pending">(위치 미정)</span>`}${linkHtml}`;
     mapLegend.appendChild(legendItem);
   });
 }
