@@ -870,6 +870,16 @@
     border-radius:var(--radius);
     overflow:hidden;
   }
+  .expense-person-card.total{
+    background:var(--sea-900);
+  }
+  .expense-person-card.total .expense-person-head{
+    background:var(--sea-900);
+  }
+  .expense-person-card.total .expense-person-head b,
+  .expense-person-card.total .expense-person-head span{
+    color:#fff;
+  }
   .expense-person-head{
     display:flex;
     align-items:center;
@@ -939,41 +949,11 @@
     font-size:.85rem;
   }
   .expense-row:last-child{border-bottom:none;}
-  .expense-row input[type="number"]{
-    width:110px;
-    padding:6px 10px;
-    border:1px solid var(--line);
-    border-radius:8px;
-    font-size:.85rem;
-    text-align:right;
+  .expense-row .value{
     font-feature-settings:'tnum';
-  }
-  .expense-row.perperson{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:8px;
-  }
-  .expense-person-inputs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    width:100%;
-  }
-  .expense-person-input{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:.78rem;
-    color:var(--muted);
-  }
-  .expense-person-input input{
-    width:90px;
-    padding:6px 8px;
-    border:1px solid var(--line);
-    border-radius:8px;
-    font-size:.82rem;
+    font-weight:700;
+    color:var(--sea-900);
     text-align:right;
-    font-feature-settings:'tnum';
   }
   .expense-shared-list{
     display:flex;
@@ -2198,23 +2178,24 @@ function personReservationShare(item, person){
 function renderReservationList(){
   const el = document.getElementById("reservation-list");
   el.innerHTML = RESERVATION_ITEMS.map(item=>{
+    const total = reservationItemTotal(item);
+
     if(item.splitType === "perPerson"){
       const val = expenseData.reservations[item.key] || {};
-      const inputsHtml = PARTICIPANTS.map(p=>`
-        <span class="expense-person-input">
-          <span class="who">${p}</span>
-          <input type="number" min="0" step="100" data-key="${item.key}" data-person="${p}" value="${val[p] || ""}" placeholder="0">
-        </span>
-      `).join("");
-      return `<div class="expense-row perperson">
+      const text = total > 0
+        ? PARTICIPANTS.map(p=>`${p} ${formatWon(val[p] || 0)}`).join(" · ")
+        : "미정";
+      return `<div class="expense-row">
         <span class="label">${item.label}</span>
-        <div class="expense-person-inputs">${inputsHtml}</div>
+        <span class="value">${text}</span>
       </div>`;
     }
-    const val = expenseData.reservations[item.key] || 0;
+
+    const perPerson = Math.round(total / PARTICIPANTS.length);
+    const text = total > 0 ? `${formatWon(total)} (1인 ${formatWon(perPerson)})` : "미정";
     return `<div class="expense-row">
       <span class="label">${item.label}</span>
-      <input type="number" min="0" step="1000" data-key="${item.key}" value="${val || ""}" placeholder="0">
+      <span class="value">${text}</span>
     </div>`;
   }).join("");
 }
@@ -2263,8 +2244,11 @@ function computePersonBreakdown(person){
 
 function renderExpenseDetail(){
   const el = document.getElementById("expense-detail");
-  el.innerHTML = PARTICIPANTS.map(person=>{
+  let grandTotal = 0;
+
+  const cardsHtml = PARTICIPANTS.map(person=>{
     const { rows, total } = computePersonBreakdown(person);
+    grandTotal += total;
     const rowsHtml = rows.length
       ? rows.map(r=>`<div class="expense-detail-row"><span>${r.label}</span><span>${formatWon(r.amount)}</span></div>`).join("")
       : `<div class="expense-detail-row">아직 입력된 경비가 없습니다.</div>`;
@@ -2273,6 +2257,12 @@ function renderExpenseDetail(){
       <div class="expense-person-body">${rowsHtml}</div>
     </div>`;
   }).join("");
+
+  const totalHtml = `<div class="expense-person-card total">
+    <div class="expense-person-head"><b>합계</b><span>${formatWon(grandTotal)}</span></div>
+  </div>`;
+
+  el.innerHTML = cardsHtml + totalHtml;
 }
 
 function updateExpenseSummary(){
@@ -2295,26 +2285,6 @@ function renderExpense(){
   renderSharedList();
   updateExpenseSummary();
 }
-
-document.getElementById("reservation-list").addEventListener("input", e=>{
-  const input = e.target.closest("input[data-key]");
-  if(!input) return;
-  const key = input.dataset.key;
-  const item = RESERVATION_ITEMS.find(it=>it.key === key);
-
-  if(item && item.splitType === "perPerson"){
-    const person = input.dataset.person;
-    if(!expenseData.reservations[key] || typeof expenseData.reservations[key] !== "object"){
-      expenseData.reservations[key] = {};
-    }
-    expenseData.reservations[key][person] = Number(input.value) || 0;
-  } else {
-    expenseData.reservations[key] = Number(input.value) || 0;
-  }
-
-  saveExpense();
-  updateExpenseSummary();
-});
 
 document.getElementById("expenseDetailToggle").addEventListener("click", ()=>{
   const el = document.getElementById("expense-detail");
