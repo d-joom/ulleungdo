@@ -974,12 +974,7 @@
     border-bottom:1px solid var(--line);
     font-size:.85rem;
   }
-  .expense-shared-item .meta{
-    display:flex;
-    flex-direction:column;
-  }
   .expense-shared-item .desc{color:var(--ink);}
-  .expense-shared-item .payer{font-size:.72rem;color:var(--muted);}
   .expense-shared-item .amt{
     font-feature-settings:'tnum';
     font-weight:700;
@@ -1004,10 +999,6 @@
     min-width:120px;
   }
   .expense-shared-item.editing .edit-amount{
-    flex:1;
-    min-width:90px;
-  }
-  .expense-shared-item.editing .edit-payer{
     flex:1;
     min-width:90px;
   }
@@ -1684,7 +1675,6 @@
       <div class="expense-add-row">
         <input type="text" id="sharedDescInput" placeholder="항목 (예: 마트 장보기)">
         <input type="number" id="sharedAmountInput" placeholder="금액" min="0" step="1000">
-        <select id="sharedPayerInput"></select>
         <button type="button" id="sharedAddBtn">추가</button>
       </div>
     </div>
@@ -2181,10 +2171,10 @@ const DEFAULT_RESERVATIONS = {
 };
 // 처음 열 때만 채워지는 공용경비 기본 항목 (주유비는 현장 결제라 예약경비가 아닌 공용경비로 관리)
 const DEFAULT_SHARED = [
-  { id: "fuel_default", desc: "주유비 (예상, 현장결제)", amount: 30000, payer: "" },
-  { id: "jjimjilbang_default", desc: "묵호 금강산 건강랜드 찜질방 (인당 17,000원, 현장결제)", amount: 51000, payer: "" },
-  { id: "monorail_default", desc: "태하향목모노레일 왕복 (인당 4,000원, 예상)", amount: 12000, payer: "" },
-  { id: "gwaneumdo_default", desc: "관음도 (인당 4,000원, 예상)", amount: 12000, payer: "" },
+  { id: "fuel_default", desc: "주유비 (예상, 현장결제)", amount: 30000 },
+  { id: "jjimjilbang_default", desc: "묵호 금강산 건강랜드 찜질방 (인당 17,000원, 현장결제)", amount: 51000 },
+  { id: "monorail_default", desc: "태하향목모노레일 왕복 (인당 4,000원, 예상)", amount: 12000 },
+  { id: "gwaneumdo_default", desc: "관음도 (인당 4,000원, 예상)", amount: 12000 },
 ];
 let expenseData = { reservations: {}, shared: [...DEFAULT_SHARED] };
 try{
@@ -2267,24 +2257,17 @@ function renderSharedList(){
   }
   el.innerHTML = expenseData.shared.map(entry=>{
     if(String(entry.id) === editingSharedId){
-      const payerOptions = `<option value="">결제자</option>` + PARTICIPANTS.map(p=>
-        `<option value="${p}"${entry.payer === p ? " selected" : ""}>${p}</option>`
-      ).join("");
       return `
       <div class="expense-shared-item editing" data-id="${entry.id}">
         <input type="text" class="edit-desc" value="${String(entry.desc).replace(/"/g, "&quot;")}">
         <input type="number" class="edit-amount" min="0" step="1000" value="${entry.amount}">
-        <select class="edit-payer">${payerOptions}</select>
         <button type="button" class="expense-save-btn" data-id="${entry.id}">저장</button>
         <button type="button" class="expense-cancel-btn" data-id="${entry.id}">취소</button>
       </div>`;
     }
     return `
     <div class="expense-shared-item" data-id="${entry.id}">
-      <div class="meta">
-        <span class="desc">${entry.desc}</span>
-        <span class="payer">${entry.payer ? entry.payer + " 결제" : "결제자 미지정"}</span>
-      </div>
+      <span class="desc">${entry.desc}</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="amt">${formatWon(entry.amount)}</span>
         <button type="button" class="expense-edit-btn" data-id="${entry.id}">✏️</button>
@@ -2393,12 +2376,10 @@ document.getElementById("shared-list").addEventListener("click", e=>{
     const row = saveBtn.closest(".expense-shared-item");
     const desc = row.querySelector(".edit-desc").value.trim();
     const amount = Number(row.querySelector(".edit-amount").value) || 0;
-    const payer = row.querySelector(".edit-payer").value;
     const entry = expenseData.shared.find(en=>String(en.id) === saveBtn.dataset.id);
     if(entry && desc){
       entry.desc = desc;
       entry.amount = amount;
-      entry.payer = payer;
     }
     editingSharedId = null;
     saveExpense();
@@ -2408,22 +2389,17 @@ document.getElementById("shared-list").addEventListener("click", e=>{
   }
 });
 
-const sharedPayerSelect = document.getElementById("sharedPayerInput");
-sharedPayerSelect.innerHTML = `<option value="">결제자</option>` + PARTICIPANTS.map(p=>`<option value="${p}">${p}</option>`).join("");
-
 document.getElementById("sharedAddBtn").addEventListener("click", ()=>{
   const descInput = document.getElementById("sharedDescInput");
   const amountInput = document.getElementById("sharedAmountInput");
   const desc = descInput.value.trim();
   const amount = Number(amountInput.value) || 0;
-  const payer = sharedPayerSelect.value;
   if(!desc || amount <= 0) return;
 
-  expenseData.shared.push({ id: Date.now(), desc, amount, payer });
+  expenseData.shared.push({ id: Date.now(), desc, amount });
   saveExpense();
   descInput.value = "";
   amountInput.value = "";
-  sharedPayerSelect.value = "";
   renderSharedList();
   updateExpenseSummary();
 });
