@@ -569,6 +569,19 @@
     height:auto;
     cursor:zoom-in;
   }
+  .sea-map-wrap{
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:#dfe9ee;
+    margin-bottom:16px;
+  }
+  .sea-map-wrap img{
+    display:block;
+    width:100%;
+    height:auto;
+    cursor:zoom-in;
+  }
   .map-pin{
     position:absolute;
     transform:translate(-50%,-50%);
@@ -1636,6 +1649,9 @@
   <!-- 스노클링 -->
   <section class="main-panel" id="panel-snorkel">
   <h3 class="section-title" style="margin-top:0">🤿 스노클링 포인트 총정리</h3>
+  <div class="sea-map-wrap">
+    <img id="sea-map-img" src="img/바다지도.png" alt="스노클링 바다지도" loading="lazy">
+  </div>
   <div class="spot-grid" id="spot-grid"></div>
 
   <!-- 추가 후보지 -->
@@ -1909,6 +1925,9 @@ mapDayTabs.addEventListener("click", e=>{
 setMapDay(1);
 document.getElementById("map-img").addEventListener("click", ()=>{
   openLightbox(["울릉도관광지도.jpg"], 0);
+});
+document.getElementById("sea-map-img").addEventListener("click", ()=>{
+  openLightbox(["바다지도.png"], 0);
 });
 
 // 관광지별 이미지 (img 폴더 기준, 추가되는 대로 여기 배열에 채워넣으면 자동 반영됨)
