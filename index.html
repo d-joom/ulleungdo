@@ -945,6 +945,21 @@
     color:var(--sea-900);
     text-align:right;
   }
+  .label-col{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .pay-badge{
+    display:inline-block;
+    width:fit-content;
+    font-size:.68rem;
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:999px;
+  }
+  .pay-badge.paid{background:var(--ok-bg);color:var(--ok);}
+  .pay-badge.pending{background:#fff4de;color:#a86a00;}
   .expense-shared-list{
     display:flex;
     flex-direction:column;
@@ -2110,14 +2125,15 @@ renderPacking();
 // ---------------------------------------------------------
 const PARTICIPANTS = ["호정","보미","주민"];
 
+// payer: "self"(각자 결제완료) · 참가자 이름(그 사람이 대신 결제, 나중에 정산 필요) · null(아직 결제 전)
 const RESERVATION_ITEMS = [
-  { key: "train", label: "🚄 기차 (서울→묵호)", splitType: "equal" },
-  { key: "bus", label: "🚌 고속버스 (동해→서울경부)", splitType: "perPerson" },
-  { key: "rent", label: "🚗 렌트카", splitType: "equal" },
-  { key: "fuel", label: "⛽ 주유비 (예상)", splitType: "equal" },
-  { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)", splitType: "equal" },
-  { key: "lodging", label: "🏠 숙소 (호텔 섬앤썸)", splitType: "equal" },
-  { key: "boat_dokdo", label: "🏝️ 독도 유람선 (저동→독도, 금 14:25)", splitType: "equal" },
+  { key: "train", label: "🚄 기차 (서울→묵호)", splitType: "equal", payer: "self" },
+  { key: "bus", label: "🚌 고속버스 (동해→서울경부)", splitType: "perPerson", payer: "self" },
+  { key: "rent", label: "🚗 렌트카", splitType: "equal", payer: "보미" },
+  { key: "fuel", label: "⛽ 주유비 (예상)", splitType: "equal", payer: null },
+  { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)", splitType: "equal", payer: "self" },
+  { key: "lodging", label: "🏠 숙소 (호텔 섬앤썸)", splitType: "equal", payer: "주민" },
+  { key: "boat_dokdo", label: "🏝️ 독도 유람선 (저동→독도, 금 14:25)", splitType: "equal", payer: null },
 ];
 
 const EXPENSE_KEY = "ulleungdo_expense_v1";
@@ -2171,6 +2187,12 @@ function personReservationShare(item, person){
   return Math.round((Number(val) || 0) / PARTICIPANTS.length);
 }
 
+function paymentBadge(item){
+  if(item.payer === "self") return `<span class="pay-badge paid">✅ 각자 결제완료</span>`;
+  if(item.payer) return `<span class="pay-badge paid">✅ ${item.payer} 결제완료</span>`;
+  return `<span class="pay-badge pending">⏳ 예약 전</span>`;
+}
+
 function renderReservationList(){
   const el = document.getElementById("reservation-list");
   el.innerHTML = RESERVATION_ITEMS.map(item=>{
@@ -2182,7 +2204,7 @@ function renderReservationList(){
         ? PARTICIPANTS.map(p=>`${p} ${formatWon(val[p] || 0)}`).join(" · ")
         : "미정";
       return `<div class="expense-row">
-        <span class="label">${item.label}</span>
+        <div class="label-col"><span class="label">${item.label}</span>${paymentBadge(item)}</div>
         <span class="value">${text}</span>
       </div>`;
     }
@@ -2190,7 +2212,7 @@ function renderReservationList(){
     const perPerson = Math.round(total / PARTICIPANTS.length);
     const text = total > 0 ? `${formatWon(total)} (1인 ${formatWon(perPerson)})` : "미정";
     return `<div class="expense-row">
-      <span class="label">${item.label}</span>
+      <div class="label-col"><span class="label">${item.label}</span>${paymentBadge(item)}</div>
       <span class="value">${text}</span>
     </div>`;
   }).join("");
@@ -2223,7 +2245,11 @@ function computePersonBreakdown(person){
   RESERVATION_ITEMS.forEach(item=>{
     const amount = personReservationShare(item, person);
     if(amount > 0){
-      rows.push({ label: item.label, amount });
+      let label = item.label;
+      if(item.payer && item.payer !== "self"){
+        label += item.payer === person ? " (선결제)" : ` (→ ${item.payer}에게 정산)`;
+      }
+      rows.push({ label, amount });
       total += amount;
     }
   });
