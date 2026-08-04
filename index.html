@@ -985,7 +985,7 @@
     <span>8/21(금) 울릉도 도착</span>
     <span>8/22(토)</span>
     <span>8/23(일)</span>
-    <span>8/24(월) 서울 복귀</span>
+    <span>8/24(월) 서울 복귀(버스)</span>
   </div>
 </header>
 
@@ -1317,7 +1317,7 @@
   <!-- 교통 -->
   <section class="main-panel" id="panel-transport">
   <!-- 서울-묵호 기차 예매 정보 -->
-  <h3 class="section-title" style="margin-top:0">🚄 서울 ↔ 묵호 기차 (예매 완료)</h3>
+  <h3 class="section-title" style="margin-top:0">🚄 서울 → 묵호 기차 (예매 완료)</h3>
   <div class="ferry-scroll">
     <table class="ferry">
       <thead>
@@ -1343,22 +1343,51 @@
             <span class="seat-chip">주민 8A</span>
           </td>
         </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="ferry-note">🎫 예매 완료</p>
+
+  <!-- 동해-서울경부 고속버스 예매 정보 -->
+  <h3 class="section-title">🚌 동해 → 서울경부 고속버스 (예매 완료)</h3>
+  <div class="ferry-scroll">
+    <table class="ferry">
+      <thead>
+        <tr>
+          <th>날짜</th>
+          <th>구간</th>
+          <th>출발</th>
+          <th>버스유형</th>
+          <th>요금</th>
+          <th>탑승자</th>
+        </tr>
+      </thead>
+      <tbody>
         <tr>
           <td class="route">8/24(월)</td>
-          <td class="route">묵호 → 서울</td>
-          <td>19:11</td>
-          <td>21:49</td>
-          <td>2호차</td>
+          <td class="route">동해 → 서울경부</td>
+          <td>15:05</td>
+          <td>프리미엄버스</td>
+          <td>33,300원</td>
           <td class="seats">
-            <span class="seat-chip">호정 13B</span>
-            <span class="seat-chip">보미 13A</span>
-            <span class="seat-chip">주민 14A</span>
+            <span class="seat-chip">보미</span>
+            <span class="seat-chip">주민</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="route">8/24(월)</td>
+          <td class="route">동해 → 서울경부</td>
+          <td>16:05</td>
+          <td>고속버스</td>
+          <td>19,300원</td>
+          <td class="seats">
+            <span class="seat-chip">호정</span>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-  <p class="ferry-note">🎫 최최종 확정! 왕복 자리 땅땅 예매 완료</p>
+  <p class="ferry-note">🚌 돌아올 때는 기차 대신 버스로 변경 · 호정은 고속버스, 보미·주민은 프리미엄버스로 각각 별도 예매</p>
 
   <!-- 묵호-울릉도 배편 정보 -->
   <h3 class="section-title">🛳️ 묵호 ↔ 울릉도(도동) 배편</h3>
@@ -2028,7 +2057,8 @@ renderPacking();
 const PARTICIPANTS = ["호정","보미","주민"];
 
 const RESERVATION_ITEMS = [
-  { key: "train", label: "🚄 기차 (서울↔묵호 왕복)" },
+  { key: "train", label: "🚄 기차 (서울→묵호)" },
+  { key: "bus", label: "🚌 고속버스 (동해→서울경부)" },
   { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)" },
   { key: "lodging", label: "🏠 숙소" },
   { key: "boat_dokdo", label: "🏝️ 독도 입도 유람선" },
