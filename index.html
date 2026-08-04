@@ -646,6 +646,8 @@
     margin-right:6px;
     flex:0 0 auto;
   }
+  .map-legend-item.no-pin{color:var(--muted);}
+  .map-legend-item .pin-pending{font-size:.7rem;color:var(--muted);}
 
   .ferry-scroll{
     overflow-x:auto;
@@ -1826,23 +1828,24 @@ function renderMapPins(){
   names.forEach((name, i)=>{
     const baseName = name.replace(/\(.*\)$/, "").trim(); // "독도(실패)" -> "독도" (좌표 조회용)
     const pos = MAP_PIN_POS[baseName];
-    if(!pos) return;
     const num = i + 1;
 
-    const el = document.createElement("div");
-    el.className = "map-pin";
-    el.style.left = pos.left + "%";
-    el.style.top = pos.top + "%";
-    el.style.background = meta.color;
-    el.textContent = num;
-    el.dataset.name = name;
-    el.title = name;
-    mapWrap.appendChild(el);
+    if(pos){
+      const el = document.createElement("div");
+      el.className = "map-pin";
+      el.style.left = pos.left + "%";
+      el.style.top = pos.top + "%";
+      el.style.background = meta.color;
+      el.textContent = num;
+      el.dataset.name = name;
+      el.title = name;
+      mapWrap.appendChild(el);
+    }
 
     const legendLabel = SNORKEL_ITINERARY_SPOTS.has(baseName) ? `🤿 ${name}` : name;
     const legendItem = document.createElement("div");
-    legendItem.className = "map-legend-item";
-    legendItem.innerHTML = `<span class="num" style="background:${meta.color}">${num}</span>${legendLabel}`;
+    legendItem.className = "map-legend-item" + (pos ? "" : " no-pin");
+    legendItem.innerHTML = `<span class="num" style="background:${pos ? meta.color : "#b8c2cc"}">${num}</span>${legendLabel}${pos ? "" : ` <span class="pin-pending">(위치 미정)</span>`}`;
     mapLegend.appendChild(legendItem);
   });
 }
