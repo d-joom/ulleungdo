@@ -985,7 +985,7 @@
     font-weight:700;
     color:var(--sea-900);
   }
-  .expense-remove-btn{
+  .expense-remove-btn, .expense-edit-btn{
     background:none;
     border:none;
     color:var(--muted);
@@ -994,6 +994,40 @@
     padding:2px 6px;
   }
   .expense-remove-btn:hover{color:#e0554f;}
+  .expense-edit-btn:hover{color:var(--sea-700);}
+  .expense-shared-item.editing{
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .expense-shared-item.editing .edit-desc{
+    flex:2;
+    min-width:120px;
+  }
+  .expense-shared-item.editing .edit-amount{
+    flex:1;
+    min-width:90px;
+  }
+  .expense-shared-item.editing .edit-payer{
+    flex:1;
+    min-width:90px;
+  }
+  .expense-shared-item.editing input, .expense-shared-item.editing select{
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:.82rem;
+    font-family:inherit;
+  }
+  .expense-shared-item.editing button{
+    padding:8px 14px;
+    border:none;
+    border-radius:8px;
+    font-size:.8rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .expense-save-btn{background:var(--accent);color:#fff;}
+  .expense-cancel-btn{background:var(--sea-100);color:var(--sea-700);}
   .expense-add-row{
     display:flex;
     flex-wrap:wrap;
@@ -2149,6 +2183,8 @@ const DEFAULT_RESERVATIONS = {
 const DEFAULT_SHARED = [
   { id: "fuel_default", desc: "주유비 (예상, 현장결제)", amount: 30000, payer: "" },
   { id: "jjimjilbang_default", desc: "묵호 금강산 건강랜드 찜질방 (인당 17,000원, 현장결제)", amount: 51000, payer: "" },
+  { id: "monorail_default", desc: "태하향목모노레일 왕복 (인당 4,000원, 예상)", amount: 12000, payer: "" },
+  { id: "gwaneumdo_default", desc: "관음도 (인당 4,000원, 예상)", amount: 12000, payer: "" },
 ];
 let expenseData = { reservations: {}, shared: [...DEFAULT_SHARED] };
 try{
@@ -2221,13 +2257,29 @@ function renderReservationList(){
   }).join("");
 }
 
+let editingSharedId = null;
+
 function renderSharedList(){
   const el = document.getElementById("shared-list");
   if(expenseData.shared.length === 0){
     el.innerHTML = `<div style="color:var(--muted);font-size:.8rem;padding:6px 0">아직 등록된 공용경비가 없습니다.</div>`;
     return;
   }
-  el.innerHTML = expenseData.shared.map(entry=>`
+  el.innerHTML = expenseData.shared.map(entry=>{
+    if(String(entry.id) === editingSharedId){
+      const payerOptions = `<option value="">결제자</option>` + PARTICIPANTS.map(p=>
+        `<option value="${p}"${entry.payer === p ? " selected" : ""}>${p}</option>`
+      ).join("");
+      return `
+      <div class="expense-shared-item editing" data-id="${entry.id}">
+        <input type="text" class="edit-desc" value="${String(entry.desc).replace(/"/g, "&quot;")}">
+        <input type="number" class="edit-amount" min="0" step="1000" value="${entry.amount}">
+        <select class="edit-payer">${payerOptions}</select>
+        <button type="button" class="expense-save-btn" data-id="${entry.id}">저장</button>
+        <button type="button" class="expense-cancel-btn" data-id="${entry.id}">취소</button>
+      </div>`;
+    }
+    return `
     <div class="expense-shared-item" data-id="${entry.id}">
       <div class="meta">
         <span class="desc">${entry.desc}</span>
@@ -2235,10 +2287,11 @@ function renderSharedList(){
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="amt">${formatWon(entry.amount)}</span>
+        <button type="button" class="expense-edit-btn" data-id="${entry.id}">✏️</button>
         <button type="button" class="expense-remove-btn" data-id="${entry.id}">✕</button>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
 }
 
 function computePersonBreakdown(person){
@@ -2312,12 +2365,47 @@ document.getElementById("expenseDetailToggle").addEventListener("click", ()=>{
 });
 
 document.getElementById("shared-list").addEventListener("click", e=>{
-  const btn = e.target.closest(".expense-remove-btn");
-  if(!btn) return;
-  expenseData.shared = expenseData.shared.filter(en=>String(en.id) !== btn.dataset.id);
-  saveExpense();
-  renderSharedList();
-  updateExpenseSummary();
+  const removeBtn = e.target.closest(".expense-remove-btn");
+  if(removeBtn){
+    expenseData.shared = expenseData.shared.filter(en=>String(en.id) !== removeBtn.dataset.id);
+    saveExpense();
+    renderSharedList();
+    updateExpenseSummary();
+    return;
+  }
+
+  const editBtn = e.target.closest(".expense-edit-btn");
+  if(editBtn){
+    editingSharedId = editBtn.dataset.id;
+    renderSharedList();
+    return;
+  }
+
+  const cancelBtn = e.target.closest(".expense-cancel-btn");
+  if(cancelBtn){
+    editingSharedId = null;
+    renderSharedList();
+    return;
+  }
+
+  const saveBtn = e.target.closest(".expense-save-btn");
+  if(saveBtn){
+    const row = saveBtn.closest(".expense-shared-item");
+    const desc = row.querySelector(".edit-desc").value.trim();
+    const amount = Number(row.querySelector(".edit-amount").value) || 0;
+    const payer = row.querySelector(".edit-payer").value;
+    const entry = expenseData.shared.find(en=>String(en.id) === saveBtn.dataset.id);
+    if(entry && desc){
+      entry.desc = desc;
+      entry.amount = amount;
+      entry.payer = payer;
+    }
+    editingSharedId = null;
+    saveExpense();
+    renderSharedList();
+    updateExpenseSummary();
+    return;
+  }
 });
 
 const sharedPayerSelect = document.getElementById("sharedPayerInput");
