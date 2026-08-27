@@ -1004,6 +1004,52 @@
     font-weight:700;
     color:var(--sea-900);
   }
+  .payer-tag{
+    display:inline-block;
+    font-size:.68rem;
+    font-weight:700;
+    color:var(--sea-700);
+    background:var(--sea-100);
+    border-radius:999px;
+    padding:1px 8px;
+    margin-left:6px;
+  }
+  .settlement-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:.9rem;
+  }
+  .settlement-row .who{font-weight:700;color:var(--sea-900);}
+  .settlement-row .amt{font-feature-settings:'tnum';font-weight:700;color:var(--accent);}
+  .settlement-empty{color:var(--muted);font-size:.85rem;padding:6px 0;}
+  .settlement-detail{
+    background:var(--sea-100);
+    border-radius:8px;
+    padding:8px 12px;
+    margin:-2px 0 12px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .settlement-detail-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:.76rem;
+    color:var(--sea-700);
+    font-feature-settings:'tnum';
+    padding:2px 0;
+  }
+  .settlement-detail-row.total{
+    border-top:1px solid #cfe6f3;
+    margin-top:4px;
+    padding-top:6px;
+    font-weight:700;
+    color:var(--sea-900);
+  }
   .expense-remove-btn, .expense-edit-btn{
     background:none;
     border:none;
@@ -1747,8 +1793,26 @@
     </div>
   </div>
 
-  <button type="button" class="expense-detail-toggle" id="expenseDetailToggle">개인별 상세보기 ▾</button>
-  <div class="expense-detail" id="expense-detail"></div>
+  <button type="button" class="expense-detail-toggle" id="expenseDetailToggle">개인별 상세 닫기 ▴</button>
+  <div class="expense-detail" id="expense-detail" style="display:grid"></div>
+  <p style="font-size:.76rem;color:var(--muted);margin:-6px 0 16px">
+    📐 계산 방식 — 예약경비(기차·버스·렌트카·배편·숙소·독도유람선)는 3인 균등분담(버스는 인원별 실요금),
+    공용경비(현장에서 다 같이 쓴 41개 항목)는 3인 균등분담, 개인경비(본인만 쓴 항목)는 분담 없이 해당 인원 전액 반영해서 각자의 "총 사용 금액"을 계산합니다.
+    누가 카드로 먼저 결제했는지는 이 총액과 별개로 아래 "최종 정산"에서 정산됩니다.
+  </p>
+
+  <div class="expense-card">
+    <div class="expense-card-head"><h4>💳 개인별 실제 결제 총액</h4></div>
+    <div class="expense-card-body expense-detail" id="paid-total-list" style="display:grid"></div>
+  </div>
+
+  <div class="expense-card">
+    <div class="expense-card-head"><h4>🔁 최종 정산 (송금 안내)</h4></div>
+    <div class="expense-card-body">
+      <div id="settlement-list"></div>
+      <p style="font-size:.76rem;color:var(--muted);margin:8px 0 0">💡 현장경비는 각자 미리 낸 공금(1인당 20만원, 총 60만원, 주민 관리)에서 지출했고 부족분은 주민이 우선 부담했습니다. 위 금액은 이를 반영한 최종 정산액입니다.</p>
+    </div>
+  </div>
 
   <div class="expense-card">
     <div class="expense-card-head"><h4>📌 예약 경비</h4><span class="cnt" id="reservationTotalTag">0원</span></div>
@@ -1762,6 +1826,7 @@
       <div class="expense-add-row">
         <input type="text" id="sharedDescInput" placeholder="항목 (예: 마트 장보기)">
         <input type="number" id="sharedAmountInput" placeholder="금액" min="0" step="1000">
+        <select id="sharedPayerInput"></select>
         <button type="button" id="sharedAddBtn">추가</button>
       </div>
     </div>
@@ -2260,10 +2325,10 @@ const RESERVATION_ITEMS = [
   { key: "rent", label: "🚗 렌트카", splitType: "equal", payer: "보미" },
   { key: "ferry", label: "⛴️ 배편 (묵호↔울릉도 왕복)", splitType: "equal", payer: "self" },
   { key: "lodging", label: "🏠 숙소 (호텔 섬앤썸)", splitType: "equal", payer: "주민" },
-  { key: "boat_dokdo", label: "🏝️ 독도 유람선 (저동→독도, 금 14:25)", splitType: "equal", payer: null },
+  { key: "boat_dokdo", label: "🏝️ 독도 유람선 (저동→독도, 금 14:25)", splitType: "equal", payer: "self" },
 ];
 
-const EXPENSE_KEY = "ulleungdo_expense_v1";
+const EXPENSE_KEY = "ulleungdo_expense_v2";
 // 이미 알려진 예약 금액 기본값 (처음 열 때만 채워지고, 직접 수정하면 그 값이 우선됨)
 const DEFAULT_RESERVATIONS = {
   train: 92100,  // 서울→묵호 기차 30,700원 x 3인
@@ -2273,12 +2338,63 @@ const DEFAULT_RESERVATIONS = {
   lodging: 260000,  // 호텔 섬앤썸
   boat_dokdo: 180000,  // 독도 유람선 1층 인당 60,000원 x 3인
 };
-// 처음 열 때만 채워지는 공용경비 기본 항목 (주유비는 현장 결제라 예약경비가 아닌 공용경비로 관리)
+// 처음 열 때만 채워지는 공용경비 기본 항목 (여행 종료 후 실제 사용 내역으로 확정, 전부 주민 결제)
+// 결제수단 미입력 항목은 chack 지역상품권 사용 → 12% 할인 반영된 실결제 금액
 const DEFAULT_SHARED = [
-  { id: "fuel_default", desc: "주유비 (예상, 현장결제)", amount: 30000 },
-  { id: "jjimjilbang_default", desc: "묵호 금강산 건강랜드 찜질방 (인당 17,000원, 현장결제)", amount: 51000 },
-  { id: "monorail_default", desc: "태하향목모노레일 왕복 (인당 4,000원, 예상)", amount: 12000 },
-  { id: "gwaneumdo_default", desc: "관음도 (인당 4,000원, 예상)", amount: 12000 },
+  // 목(8/20) 묵호
+  { id: "thu1", desc: "택시 (묵호역→찜질방)", amount: 4600, payer: "주민" },
+  { id: "thu2", desc: "금강산 건강랜드 찜질방 입장료", amount: 51000, payer: "주민" },
+  { id: "thu3", desc: "찜질방 콜라", amount: 2000, payer: "주민" },
+  { id: "thu4", desc: "찜질방 라면", amount: 4000, payer: "주민" },
+  // 금(8/21) 울릉도 도착
+  { id: "fri1", desc: "택시 (찜질방→묵호항)", amount: 4900, payer: "주민" },
+  { id: "fri2", desc: "묵호항 생수 3병", amount: 3000, payer: "주민" },
+  { id: "fri3", desc: "다애식당 (지역상품권 12% 할인)", amount: 48400, payer: "주민" },
+  { id: "fri4", desc: "카페 (지역상품권 12% 할인)", amount: 11880, payer: "주민" },
+  { id: "fri5", desc: "숙소 인원추가", amount: 20000, payer: "주민" },
+  { id: "fri6", desc: "철수네쉼터 호박식혜", amount: 15000, payer: "주민" },
+  { id: "fri7", desc: "독도문방구 비니·티셔츠 (지역상품권 12% 할인)", amount: 23760, payer: "주민" },
+  { id: "fri8", desc: "야시장 회·오징어회", amount: 70000, payer: "주민" },
+  { id: "fri9", desc: "야시장 맥주 3캔", amount: 9000, payer: "주민" },
+  { id: "fri10", desc: "야시장 소주", amount: 3000, payer: "주민" },
+  { id: "fri11", desc: "야시장 콜라", amount: 2000, payer: "주민" },
+  { id: "fri12", desc: "야시장 오징어부추전·반건조오징어 (지역상품권 12% 할인)", amount: 22000, payer: "주민" },
+  { id: "fri13", desc: "택시 (저동→도동)", amount: 6880, payer: "주민" },
+  { id: "fri14", desc: "편의점 (지역상품권 12% 할인)", amount: 15224, payer: "주민" },
+  { id: "fri15", desc: "가야수산 호박캬라멜 (지역상품권 12% 할인)", amount: 4400, payer: "주민" },
+  // 토(8/22)
+  { id: "sat1", desc: "태극기·손수건 (지역상품권 12% 할인)", amount: 9504, payer: "주민" },
+  { id: "sat2", desc: "태양식당 따개비칼국수", amount: 55000, payer: "주민" },
+  { id: "sat3", desc: "태하향목모노레일 왕복", amount: 12000, payer: "주민" },
+  { id: "sat4", desc: "래우 커피 (지역상품권 12% 할인)", amount: 19800, payer: "주민" },
+  { id: "sat5", desc: "신비섬횟집 (지역상품권 12% 할인)", amount: 22000, payer: "주민" },
+  { id: "sat6", desc: "울릉술 (지역상품권 12% 할인)", amount: 10560, payer: "주민" },
+  { id: "sat7", desc: "마루통닭 (지역상품권 12% 할인)", amount: 20240, payer: "주민" },
+  { id: "sat8", desc: "독도사랑쌀도우피자 (지역상품권 12% 할인)", amount: 36960, payer: "주민" },
+  { id: "sat9", desc: "아리랑김밥 (결제)", amount: 14000, payer: "주민" },
+  // 일(8/23)
+  { id: "sun1", desc: "독도문방구 키링 4개 (지역상품권 12% 할인)", amount: 28160, payer: "주민" },
+  { id: "sun2", desc: "저동커피", amount: 14500, payer: "주민" },
+  { id: "sun3", desc: "저동커피 아이스크림", amount: 4500, payer: "주민" },
+  { id: "sun4", desc: "저동 하나로마트 (지역상품권 12% 할인)", amount: 26664, payer: "주민" },
+  { id: "sun5", desc: "저동 CU 편의점", amount: 3700, payer: "주민" },
+  { id: "sun6", desc: "관음도 입장료", amount: 12000, payer: "주민" },
+  { id: "sun7", desc: "카페너와 (지역상품권 12% 할인)", amount: 19800, payer: "주민" },
+  { id: "sun8", desc: "명품해물찜", amount: 89000, payer: "주민" },
+  { id: "sun9", desc: "편의점 아이스크림 (지역상품권 12% 할인)", amount: 3520, payer: "주민" },
+  // 월(8/24) 서울 복귀
+  { id: "mon1", desc: "주유비", amount: 20000, payer: "주민" },
+  { id: "mon2", desc: "추가 주유비", amount: 7000, payer: "주민" },
+  { id: "mon3", desc: "가야수산 호박식혜 (지역상품권 12% 할인)", amount: 4400, payer: "주민" },
+  { id: "mon4", desc: "홍합밥", amount: 60000, payer: "주민" },
+  { id: "personal1", desc: "다이소 알로에젤", amount: 6000, payer: "호정" },
+  { id: "personal2", desc: "약국", amount: 11000, payer: "보미" },
+  { id: "personal3", desc: "다이소", amount: 7000, payer: "보미" },
+];
+// 여행 전 미리 공금(현장경비용, 1인당 20만원)을 주민에게 입금해둔 내역 - 최종 정산에 반영
+const PRE_SETTLED = [
+  { from: "호정", to: "주민", amount: 200000, desc: "공금(현장경비용) 사전 입금" },
+  { from: "보미", to: "주민", amount: 200000, desc: "공금(현장경비용) 사전 입금" },
 ];
 let expenseData = { reservations: {}, shared: [...DEFAULT_SHARED] };
 try{
@@ -2365,13 +2481,17 @@ function renderSharedList(){
       <div class="expense-shared-item editing" data-id="${entry.id}">
         <input type="text" class="edit-desc" value="${String(entry.desc).replace(/"/g, "&quot;")}">
         <input type="number" class="edit-amount" min="0" step="1000" value="${entry.amount}">
+        <select class="edit-payer">
+          <option value="" ${!entry.payer ? "selected" : ""}>미정(정산제외)</option>
+          ${PARTICIPANTS.map(p=>`<option value="${p}" ${entry.payer === p ? "selected" : ""}>${p} 결제</option>`).join("")}
+        </select>
         <button type="button" class="expense-save-btn" data-id="${entry.id}">저장</button>
         <button type="button" class="expense-cancel-btn" data-id="${entry.id}">취소</button>
       </div>`;
     }
     return `
     <div class="expense-shared-item" data-id="${entry.id}">
-      <span class="desc">${entry.desc}</span>
+      <span class="desc">${entry.desc}${entry.payer ? `<span class="payer-tag">${entry.payer} 결제</span>` : ""}${(entry.splitAmong && entry.splitAmong.length && !isFullGroup(entry.splitAmong)) ? `<span class="payer-tag">${entry.splitAmong.join("·")} ${entry.splitAmong.length === 1 ? "전액" : "분담"}</span>` : ""}</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="amt">${formatWon(entry.amount)}</span>
         <button type="button" class="expense-edit-btn" data-id="${entry.id}">✏️</button>
@@ -2379,6 +2499,28 @@ function renderSharedList(){
       </div>
     </div>`;
   }).join("");
+}
+
+// 이 항목을 나눠 낼 인원 목록. splitAmong이 없으면 전원(PARTICIPANTS) 균등분담.
+function sharedSplitGroup(entry){
+  return (entry.splitAmong && entry.splitAmong.length) ? entry.splitAmong : PARTICIPANTS;
+}
+function isFullGroup(group){
+  return group.length === PARTICIPANTS.length && PARTICIPANTS.every(p=>group.includes(p));
+}
+
+// 3인 균등분담(공용) 항목들을 결제자 기준 3그룹(주민공용/호정공용/보미공용)으로 묶은 합계.
+function computeSharedCategoryTotals(){
+  const totals = {};
+  PARTICIPANTS.forEach(p=>totals[p] = 0);
+  expenseData.shared.forEach(entry=>{
+    const amount = Number(entry.amount) || 0;
+    if(amount <= 0) return;
+    const group = sharedSplitGroup(entry);
+    if(!isFullGroup(group)) return;
+    if(entry.payer && totals[entry.payer] !== undefined) totals[entry.payer] += amount;
+  });
+  return totals;
 }
 
 function computePersonBreakdown(person){
@@ -2390,21 +2532,87 @@ function computePersonBreakdown(person){
     if(amount > 0){
       let label = item.label;
       if(item.payer && item.payer !== "self"){
-        label += item.payer === person ? " (선결제)" : ` (→ ${item.payer}에게 정산)`;
+        label += item.payer === person ? " (결제)" : ` (→ ${item.payer}에게 정산)`;
       }
       rows.push({ label, amount });
       total += amount;
     }
   });
 
-  const sharedTotal = expenseData.shared.reduce((s,e)=>s+(Number(e.amount)||0), 0);
-  const sharedShare = Math.round(sharedTotal / PARTICIPANTS.length);
-  if(sharedShare > 0){
-    rows.push({ label: "🧾 공용경비 분담", amount: sharedShare });
-    total += sharedShare;
-  }
+  const categoryTotals = computeSharedCategoryTotals();
+  PARTICIPANTS.forEach(owner=>{
+    const catTotal = categoryTotals[owner];
+    if(catTotal <= 0) return;
+    const share = Math.round(catTotal / PARTICIPANTS.length);
+    rows.push({ label: `🧾 ${owner}공용 (${formatWon(Math.round(catTotal))} ÷ ${PARTICIPANTS.length}인)`, amount: share });
+    total += share;
+  });
+
+  const partialRows = [];
+  expenseData.shared.forEach(entry=>{
+    const amount = Number(entry.amount) || 0;
+    if(amount <= 0) return;
+    const group = sharedSplitGroup(entry);
+    if(isFullGroup(group)) return;
+    if(!group.includes(person)) return;
+    const share = amount / group.length;
+    const groupLabel = group.length === 1 ? "전액" : `${group.join("·")} ${group.length}인 분담`;
+    partialRows.push({ label: `🧍 ${entry.desc} (${groupLabel})`, amount: share });
+  });
+  partialRows.forEach(r=>{ rows.push(r); total += r.amount; });
 
   return { rows, total };
+}
+
+// 각자결제: 기차·버스·배편·독도유람선처럼 각자 자기 몫만큼 결제한 금액
+function computeSelfPaid(person){
+  let total = 0;
+  RESERVATION_ITEMS.forEach(item=>{
+    if(item.payer === "self") total += personReservationShare(item, person);
+  });
+  return total;
+}
+
+// 공금결제: 렌트카·숙소·현장 공용경비처럼 이 사람이 그룹 몫까지 대신 결제한 금액.
+// - 전원(3인) 분담 항목은 실제 결제자 몫으로 잡는다.
+// - 일부 인원만 나눠 낸 항목은 결제자가 아니라 그 항목의 당사자들 몫으로 잡는다.
+function computePoolPaid(person){
+  let total = 0;
+  RESERVATION_ITEMS.forEach(item=>{
+    if(item.payer && item.payer !== "self" && item.payer === person){
+      total += reservationItemTotal(item);
+    }
+  });
+  expenseData.shared.forEach(entry=>{
+    const amount = Number(entry.amount) || 0;
+    if(amount <= 0) return;
+    const group = sharedSplitGroup(entry);
+    if(isFullGroup(group)){
+      if(entry.payer === person) total += amount;
+    } else if(group.includes(person)){
+      total += amount / group.length;
+    }
+  });
+  return total;
+}
+
+function computePaidTotal(person){
+  return computeSelfPaid(person) + computePoolPaid(person);
+}
+
+function renderPaidTotals(){
+  const el = document.getElementById("paid-total-list");
+  el.innerHTML = PARTICIPANTS.map(p=>{
+    const self = computeSelfPaid(p);
+    const pool = computePoolPaid(p);
+    return `<div class="expense-person-card">
+      <div class="expense-person-head"><b>${p}</b><span>${formatWon(self + pool)}</span></div>
+      <div class="expense-person-body">
+        <div class="expense-detail-row"><span>각자결제 비용</span><span>${formatWon(self)}</span></div>
+        <div class="expense-detail-row"><span>공금결제 비용</span><span>${formatWon(pool)}</span></div>
+      </div>
+    </div>`;
+  }).join("");
 }
 
 function renderExpenseDetail(){
@@ -2422,6 +2630,107 @@ function renderExpenseDetail(){
   }).join("");
 }
 
+// a, b 두 사람 사이의 실제 채무 관계만 직접 계산한다(허브 경유 없이 당사자끼리 정산).
+// net > 0 이면 a가 b에게, net < 0 이면 b가 a에게 줘야 하는 금액.
+function computePairwiseBreakdown(a, b){
+  const items = [];
+
+  RESERVATION_ITEMS.forEach(item=>{
+    if(!item.payer || item.payer === "self") return;
+    if(item.payer !== a && item.payer !== b) return;
+    const creditor = item.payer;
+    const debtor = (creditor === a) ? b : a;
+    const share = personReservationShare(item, debtor);
+    if(share <= 0) return;
+    const amount = (debtor === a) ? share : -share;
+    items.push({ label: `${item.label} (${debtor} 몫 → ${creditor})`, amount });
+  });
+
+  // 3인 균등분담(공용) 항목은 채권자별로 합쳐서 한 줄로 보여준다
+  const fullGroupTotalByCreditor = {};
+  expenseData.shared.forEach(entry=>{
+    const amt = Number(entry.amount) || 0;
+    if(amt <= 0 || !entry.payer) return;
+    const group = sharedSplitGroup(entry);
+
+    if(isFullGroup(group)){
+      if(entry.payer !== a && entry.payer !== b) return;
+      fullGroupTotalByCreditor[entry.payer] = (fullGroupTotalByCreditor[entry.payer] || 0) + amt;
+      return;
+    }
+
+    if(entry.payer !== a && entry.payer !== b) return;
+    const creditor = entry.payer;
+    const debtor = (creditor === a) ? b : a;
+    if(!group.includes(debtor)) return;
+    const share = amt / group.length;
+    const amount = (debtor === a) ? share : -share;
+    items.push({ label: `${entry.desc} (${debtor} 몫 → ${creditor})`, amount });
+  });
+
+  [a, b].forEach(creditor=>{
+    const total = fullGroupTotalByCreditor[creditor];
+    if(!total) return;
+    const debtor = (creditor === a) ? b : a;
+    const share = total / PARTICIPANTS.length;
+    const amount = (debtor === a) ? share : -share;
+    items.push({
+      label: `🧾 ${creditor}공용 (${formatWon(Math.round(total))} ÷ ${PARTICIPANTS.length}인, ${debtor} 몫 → ${creditor})`,
+      amount
+    });
+  });
+
+  PRE_SETTLED.forEach(t=>{
+    if(t.from === a && t.to === b) items.push({ label: `${t.desc} (이미 지급)`, amount: -t.amount });
+    if(t.from === b && t.to === a) items.push({ label: `${t.desc} (이미 지급)`, amount: t.amount });
+  });
+
+  const net = items.reduce((s, i) => s + i.amount, 0);
+  return { items, net };
+}
+
+function computeTransfers(){
+  const EPS = 0.5;
+  const transfers = [];
+  for(let i = 0; i < PARTICIPANTS.length; i++){
+    for(let j = i + 1; j < PARTICIPANTS.length; j++){
+      const a = PARTICIPANTS[i], b = PARTICIPANTS[j];
+      const { net } = computePairwiseBreakdown(a, b);
+      if(net > EPS) transfers.push({ from: a, to: b, amount: Math.round(net) });
+      else if(net < -EPS) transfers.push({ from: b, to: a, amount: Math.round(-net) });
+    }
+  }
+  return transfers;
+}
+
+function formatSignedWon(n){
+  const v = Math.round(n);
+  return (v < 0 ? "-" : "+") + formatWon(Math.abs(v));
+}
+
+function renderSettlement(){
+  const el = document.getElementById("settlement-list");
+  const transfers = computeTransfers();
+
+  el.innerHTML = transfers.length
+    ? transfers.map(t=>{
+        const { items } = computePairwiseBreakdown(t.from, t.to);
+        const detailHtml = items.map(i=>
+          `<div class="settlement-detail-row"><span>${i.label}</span><span>${formatSignedWon(i.amount)}</span></div>`
+        ).join("");
+        return `
+        <div class="settlement-row">
+          <span class="who">${t.from} → ${t.to}</span>
+          <span class="amt">${formatWon(t.amount)}</span>
+        </div>
+        <div class="settlement-detail">
+          ${detailHtml}
+          <div class="settlement-detail-row total"><span>합계</span><span>${formatWon(t.amount)}</span></div>
+        </div>`;
+      }).join("")
+    : `<div class="settlement-empty">정산할 송금 내역이 없습니다.</div>`;
+}
+
 function updateExpenseSummary(){
   const reservationTotal = RESERVATION_ITEMS.reduce((s,item)=>s+reservationItemTotal(item), 0);
   const sharedTotal = expenseData.shared.reduce((s,e)=>s+(Number(e.amount)||0), 0);
@@ -2434,10 +2743,17 @@ function updateExpenseSummary(){
   document.getElementById("sharedTotalTag").textContent = formatWon(sharedTotal);
 
   renderExpenseDetail();
+  renderPaidTotals();
+  renderSettlement();
 }
 
 function renderExpense(){
   document.getElementById("expensePerPersonLabel").textContent = `1인당 분담액 (${PARTICIPANTS.join("·")})`;
+  const payerSelect = document.getElementById("sharedPayerInput");
+  if(payerSelect && payerSelect.options.length === 0){
+    payerSelect.innerHTML = `<option value="">미정(정산제외)</option>` +
+      PARTICIPANTS.map(p=>`<option value="${p}">${p} 결제</option>`).join("");
+  }
   renderReservationList();
   renderSharedList();
   updateExpenseSummary();
@@ -2480,10 +2796,12 @@ document.getElementById("shared-list").addEventListener("click", e=>{
     const row = saveBtn.closest(".expense-shared-item");
     const desc = row.querySelector(".edit-desc").value.trim();
     const amount = Number(row.querySelector(".edit-amount").value) || 0;
+    const payer = row.querySelector(".edit-payer").value || null;
     const entry = expenseData.shared.find(en=>String(en.id) === saveBtn.dataset.id);
     if(entry && desc){
       entry.desc = desc;
       entry.amount = amount;
+      entry.payer = payer;
     }
     editingSharedId = null;
     saveExpense();
@@ -2496,14 +2814,17 @@ document.getElementById("shared-list").addEventListener("click", e=>{
 document.getElementById("sharedAddBtn").addEventListener("click", ()=>{
   const descInput = document.getElementById("sharedDescInput");
   const amountInput = document.getElementById("sharedAmountInput");
+  const payerInput = document.getElementById("sharedPayerInput");
   const desc = descInput.value.trim();
   const amount = Number(amountInput.value) || 0;
+  const payer = payerInput.value || null;
   if(!desc || amount <= 0) return;
 
-  expenseData.shared.push({ id: Date.now(), desc, amount });
+  expenseData.shared.push({ id: Date.now(), desc, amount, payer });
   saveExpense();
   descInput.value = "";
   amountInput.value = "";
+  payerInput.value = "";
   renderSharedList();
   updateExpenseSummary();
 });
